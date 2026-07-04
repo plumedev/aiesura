@@ -1,0 +1,40 @@
+{
+  "name": "Projet-SDD",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@iconify-json/lucide": "^1.2.114",
+    "@iconify-json/simple-icons": "^1.2.86",
+    "@nuxt/ui": "^4.9.0",
+    "@nuxtjs/supabase": "^2.0.9",
+    "drizzle-orm": "^0.45.2",
+    "nuxt": "^4.4.8",
+    "postgres": "^3.4.9",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@fission-ai/openspec": "^1.4.1",
+    "@nuxt/eslint": "^1.16.0",
+    "@nuxt/test-utils": "^4.0.3",
+    "@playwright/test": "^1.61.1",
+    "@vue/test-utils": "^2.4.11",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^10.5.0",
+    "happy-dom": "^20.10.6",
+    "playwright": "^1.61.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
+    "vue-tsc": "^3.3.5"
+  }
+}
