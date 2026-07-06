@@ -12,9 +12,14 @@ const logout = async () => {
   <div class="p-8 max-w-4xl mx-auto space-y-8">
     <div class="flex items-center justify-between">
       <h1 class="text-3xl font-bold">Dashboard</h1>
-      <UButton color="gray" variant="ghost" icon="i-lucide-log-out" @click="logout">
-        Déconnexion
-      </UButton>
+      <div class="flex space-x-4">
+        <UButton to="/dashboard/accounts" color="primary" variant="soft" icon="i-lucide-wallet">
+          Mes Comptes
+        </UButton>
+        <UButton color="gray" variant="ghost" icon="i-lucide-log-out" @click="logout">
+          Déconnexion
+        </UButton>
+      </div>
     </div>
 
     <UCard>
