@@ -11,6 +11,6 @@ export default defineEventHandler(async (event) => {
   if (!id) throw createError({ statusCode: 400, statusMessage: 'ID is required' })
 
   await db.delete(monthlyFlows).where(and(eq(monthlyFlows.id, id), eq(monthlyFlows.userId, user.id)))
-  
+
   return { success: true }
 })

@@ -4,7 +4,10 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' }
   ],
   link: [
-    { rel: 'icon', href: '/favicon.ico' }
+    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap' }
   ],
   htmlAttrs: {
     lang: 'en'
@@ -33,8 +36,6 @@ const user = useSupabaseUser()
         <NuxtLink to="/">
           <AppLogo class="w-auto h-6 shrink-0" />
         </NuxtLink>
-
-        <TemplateMenu />
       </template>
 
       <template #right>
@@ -56,15 +57,6 @@ const user = useSupabaseUser()
         />
 
         <UColorModeButton />
-
-        <UButton
-          to="https://github.com/nuxt-ui-templates/starter"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
-          color="neutral"
-          variant="ghost"
-        />
       </template>
     </UHeader>
 
@@ -81,16 +73,7 @@ const user = useSupabaseUser()
         </p>
       </template>
 
-      <template #right>
-        <UButton
-          to="https://github.com/nuxt-ui-templates/starter"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
-          color="neutral"
-          variant="ghost"
-        />
-      </template>
+      <template #right />
     </UFooter>
   </UApp>
 </template>

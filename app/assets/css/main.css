@@ -2,17 +2,57 @@
 @import "@nuxt/ui";
 
 @theme static {
-  --font-sans: 'Public Sans', sans-serif;
+  --font-sans: 'Outfit', sans-serif;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  /* Primary color mapping to match Light/Dark needs */
+  /* 500 is used for solid background in Light Mode */
+  --color-primary-500: #0A332C;
+  --color-primary-600: #0F5040;
+  /* 400 is used for solid background in Dark Mode */
+  --color-primary-400: #50E8A8;
+  --color-primary-300: #A1EACA;
+
+  /* Neutral text color */
+  --color-neutral-900: #343434;
+}
+
+:root {
+  --color-bg-app: #E8EFEB;
+  --color-bg-surface: #FFFFFF;
+  --color-text-main: #343434;
+}
+
+.dark {
+  --color-bg-app: #0A332C;
+  --color-bg-surface: #0F5040;
+  --color-text-main: #FFFFFF;
+}
+
+/* Retrait global des bordures et rings (hors focus) pour un design ultra plat/épuré */
+*, ::before, ::after {
+  border-color: transparent !important;
+  outline-color: transparent !important;
+}
+
+/* Retrait des ombres de bordure (rings) générées par Nuxt UI */
+.ring-1:not(:focus-visible):not(:focus-within) {
+  --tw-ring-color: transparent !important;
+  box-shadow: none !important;
+}
+
+body {
+  background-color: var(--color-bg-app);
+  color: var(--color-text-main);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Utilitaires Glassmorphisme / Surfaces */
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.dark .glass-panel {
+  background-color: rgba(15, 80, 64, 0.3);
 }
