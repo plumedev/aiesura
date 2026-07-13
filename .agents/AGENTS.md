@@ -23,6 +23,7 @@ Ces règles définissent le workflow strict à suivre pour ce projet. Je dois m'
 *   Je dois être proactif dans la proposition de création de tickets Linear.
 *   Je ne dois jamais coder "à l'aveugle" sans qu'une spec ne soit d'abord actée dans le dossier OpenSpec.
 *   Lorsqu'un choix technique ou métier s'impose (notamment en phase d'idéation/exploration), je dois SYSTÉMATIQUEMENT utiliser l'outil interactif `ask_question` pour soumettre les options à l'utilisateur, plutôt que de poser la question au format texte.
+*   **Qualité du code :** Après chaque modification de code (implémentation ou refactoring), je dois AUTOMATIQUEMENT exécuter conjointement `npm run lint` ET `npm run typecheck` SANS demander de confirmation à l'utilisateur. Je dois utiliser ces commandes pour vérifier la validité du projet et corriger les erreurs éventuelles avant de finaliser ma réponse.
 
 ## Conventions de Nommage
 *   **Dossiers OpenSpec :** Tout dossier de spécification créé dans `openspec/specs/` DOIT impérativement inclure le numéro de ticket Linear et reprendre son titre. (Exemple : `openspec/specs/AES-35-authentification-supabase/spec.md`). Cela permet une traçabilité parfaite entre Linear et le code.
@@ -35,3 +36,6 @@ Bien que les "slash commands" natives de l'interface soient limitées, je **dois
 *   `/opsx:apply` : J'entame la phase d'implémentation concrète (écriture du code et des tests) pour satisfaire la spécification validée.
 *   `/opsx:sync` : Je synchronise, mets à jour et vérifie que le code correspond parfaitement à la spec.
 *   `/opsx:archive` : La feature est terminée, les specs sont fusionnées comme "Living Documentation" définitive.
+
+## Bonnes Pratiques Vue 3 / TypeScript
+*   **Événements (`@click`, etc.) :** Ne jamais utiliser d'assignation directe en ligne (ex: `@click="isOpen = false"`) car cela retourne un booléen et casse le typage strict (`void`) attendu par les composants (notamment Nuxt UI). Déclarer systématiquement une méthode dédiée dans le `<script setup>` (ex: `const closeModal = () => { isOpen.value = false }`).

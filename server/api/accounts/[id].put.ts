@@ -6,7 +6,7 @@ import { eq, and } from 'drizzle-orm'
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
   const userId = user?.sub
-  
+
   if (!user || !userId) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedAccount = await db.update(accounts)
-    .set({ 
+    .set({
       ...(name !== undefined && { name }),
       ...(icon !== undefined && { icon }),
       ...(color !== undefined && { color }),

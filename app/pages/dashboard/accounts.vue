@@ -3,8 +3,7 @@ const { data: accounts, refresh } = await useFetch('/api/accounts')
 const toast = useToast()
 
 const columns = [
-  { accessorKey: 'icon', header: '' },
-  { accessorKey: 'name', header: 'Nom du compte' },
+  { accessorKey: 'name', header: 'Compte' },
   { accessorKey: 'isMain', header: 'Statut' },
   { id: 'actions' }
 ]
@@ -42,10 +41,14 @@ const createAccount = async () => {
   }
 }
 
-const openEditModal = (account: any) => {
+const openEditModal = (account: { id: string, name: string }) => {
   formState.id = account.id
   formState.name = account.name
   isEditOpen.value = true
+}
+
+const closeEditModal = () => {
+  isEditOpen.value = false
 }
 
 const updateAccount = async () => {
@@ -73,7 +76,7 @@ const setAsMain = async (id: string) => {
       body: { isMain: true }
     })
     await refresh()
-    toast.add({ 
+    toast.add({
       title: 'Défini comme compte principal',
       color: 'success'
     })
@@ -85,6 +88,10 @@ const setAsMain = async (id: string) => {
 const confirmDelete = (id: string) => {
   accountToDelete.value = id
   isDeleteOpen.value = true
+}
+
+const closeDeleteModal = () => {
+  isDeleteOpen.value = false
 }
 
 const deleteAccount = async () => {
@@ -104,7 +111,7 @@ const deleteAccount = async () => {
   }
 }
 
-const items = (row: any) => [
+const items = (row: { id: string, name: string, isMain: boolean }) => [
   [
     {
       label: 'Modifier',
@@ -114,7 +121,7 @@ const items = (row: any) => [
     {
       label: 'Définir comme principal',
       icon: 'i-heroicons-star',
-      disabled: row.isMain,
+      disabled: Boolean(row.isMain),
       onSelect: () => setAsMain(row.id)
     }
   ],
@@ -122,7 +129,7 @@ const items = (row: any) => [
     {
       label: 'Supprimer',
       icon: 'i-heroicons-trash',
-      color: 'error',
+      color: 'error' as const,
       onSelect: () => confirmDelete(row.id)
     }
   ]
@@ -130,56 +137,85 @@ const items = (row: any) => [
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto space-y-6 p-8">
-    <div class="mb-4">
-      <UButton to="/dashboard" color="neutral" variant="ghost" icon="i-lucide-arrow-left">
+  <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-8">
+    <div class="mb-2 sm:mb-4">
+      <UButton
+        to="/dashboard"
+        color="neutral"
+        variant="ghost"
+        icon="i-lucide-arrow-left"
+        class="-ml-2 sm:ml-0"
+      >
         Retour au Dashboard
       </UButton>
     </div>
-    
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Mes Comptes</h1>
+
+    <div class="flex items-center justify-between mb-2 sm:mb-6">
+      <h1 class="text-2xl sm:text-3xl font-bold">
+        Mes Comptes
+      </h1>
     </div>
 
-    <UCard>
+    <UCard id="plop">
       <template #header>
-        <div class="flex items-center gap-4 w-full">
-          <UInput 
-            v-model="newAccountName" 
-            placeholder="Nom du nouveau compte (ex: Perso SG, Revolut...)" 
-            class="flex-1" 
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full">
+          <UInput
+            v-model="newAccountName"
+            placeholder="Nom du nouveau compte (ex: Perso SG...)"
+            class="flex-1"
             @keyup.enter="createAccount"
           />
-          <UButton 
-            icon="i-heroicons-plus" 
-            label="Créer" 
+          <UButton
+            icon="i-heroicons-plus"
+            label="Créer"
             color="primary"
             :loading="loading"
             :disabled="!newAccountName.trim()"
-            @click="createAccount" 
+            class="w-full justify-center sm:w-auto"
+            @click="createAccount"
           />
         </div>
       </template>
 
-      <UTable :columns="columns" :data="accounts || []">
-        <template #icon-cell="{ row }">
-          <UIcon :name="row.original.icon || 'i-heroicons-building-library'" class="w-6 h-6" :class="`text-${row.original.color || 'blue'}-500`" />
-        </template>
-        
+      <UTable
+        :columns="columns"
+        :data="accounts || []"
+      >
         <template #name-cell="{ row }">
-          <span class="font-semibold">{{ row.original.name }}</span>
+          <div class="flex items-center gap-3">
+            <UIcon
+              :name="row.original.icon || 'i-heroicons-building-library'"
+              class="w-5 h-5 flex-shrink-0"
+              :class="`text-${row.original.color || 'blue'}-500`"
+            />
+            <span class="font-semibold">{{ row.original.name }}</span>
+          </div>
         </template>
-        
+
         <template #isMain-cell="{ row }">
           <div>
-            <UBadge v-if="row.original.isMain" color="warning" variant="subtle" icon="i-heroicons-star">Principal</UBadge>
+            <UBadge
+              v-if="row.original.isMain"
+              color="warning"
+              variant="subtle"
+              icon="i-heroicons-star"
+            >
+              Principal
+            </UBadge>
           </div>
         </template>
 
         <template #actions-cell="{ row }">
           <div class="flex justify-end">
-            <UDropdownMenu :items="items(row.original)">
-              <UButton color="neutral" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+            <UDropdownMenu
+              :items="items(row.original)"
+              :content="{ side: 'left', align: 'start' }"
+            >
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-heroicons-ellipsis-horizontal-20-solid"
+              />
             </UDropdownMenu>
           </div>
         </template>
@@ -191,15 +227,36 @@ const items = (row: any) => [
       <template #content>
         <UCard>
           <template #header>
-            <h3 class="text-lg font-semibold">Modifier le compte</h3>
+            <h3 class="text-lg font-semibold">
+              Modifier le compte
+            </h3>
           </template>
-          <form @submit.prevent="updateAccount" class="space-y-4">
+          <form
+            class="space-y-4"
+            @submit.prevent="updateAccount"
+          >
             <UFormField label="Nom du compte">
-              <UInput v-model="formState.name" required autofocus />
+              <UInput
+                v-model="formState.name"
+                required
+                autofocus
+              />
             </UFormField>
-            <div class="flex justify-end space-x-3 pt-4">
-              <UButton label="Annuler" color="neutral" variant="ghost" @click="isEditOpen = false" />
-              <UButton type="submit" label="Sauvegarder" color="primary" :loading="loading" />
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
+              <UButton
+                label="Annuler"
+                color="neutral"
+                variant="ghost"
+                class="w-full justify-center sm:w-auto"
+                @click="closeEditModal"
+              />
+              <UButton
+                type="submit"
+                label="Sauvegarder"
+                color="primary"
+                :loading="loading"
+                class="w-full justify-center sm:w-auto"
+              />
             </div>
           </form>
         </UCard>
@@ -212,7 +269,10 @@ const items = (row: any) => [
         <UCard>
           <template #header>
             <h3 class="text-lg font-semibold text-red-500 flex items-center gap-2">
-              <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5" />
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="w-5 h-5"
+              />
               Confirmer la suppression
             </h3>
           </template>
@@ -220,9 +280,21 @@ const items = (row: any) => [
             <p class="text-gray-600 dark:text-gray-300">
               Êtes-vous sûr de vouloir supprimer ce compte ? Toutes les dépenses, flux et règles de transferts qui y sont liés seront définitivement supprimés de la base de données.
             </p>
-            <div class="flex justify-end space-x-3 pt-4">
-              <UButton label="Annuler" color="neutral" variant="ghost" @click="isDeleteOpen = false" />
-              <UButton label="Oui, supprimer" color="error" :loading="loading" @click="deleteAccount" />
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
+              <UButton
+                label="Annuler"
+                color="neutral"
+                variant="ghost"
+                class="w-full justify-center sm:w-auto"
+                @click="closeDeleteModal"
+              />
+              <UButton
+                label="Oui, supprimer"
+                color="error"
+                :loading="loading"
+                class="w-full justify-center sm:w-auto"
+                @click="deleteAccount"
+              />
             </div>
           </div>
         </UCard>

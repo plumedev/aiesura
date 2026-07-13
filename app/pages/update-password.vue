@@ -9,11 +9,11 @@ const updatePassword = async () => {
   loading.value = true
   errorMsg.value = ''
   successMsg.value = ''
-  
+
   const { error } = await supabase.auth.updateUser({
     password: password.value
   })
-  
+
   if (error) {
     errorMsg.value = error.message
   } else {
@@ -30,22 +30,53 @@ const updatePassword = async () => {
   <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
     <UCard class="w-full max-w-sm">
       <template #header>
-        <h2 class="text-xl font-semibold text-center">Nouveau mot de passe</h2>
+        <h2 class="text-xl font-semibold text-center">
+          Nouveau mot de passe
+        </h2>
       </template>
 
-      <form @submit.prevent="updatePassword" class="space-y-6">
+      <form
+        class="space-y-6"
+        @submit.prevent="updatePassword"
+      >
         <p class="text-sm text-gray-500 dark:text-gray-400">
           Veuillez saisir votre nouveau mot de passe ci-dessous.
         </p>
 
-        <UFormField label="Nouveau mot de passe" name="password">
-          <UInput v-model="password" type="password" placeholder="••••••••" class="w-full" required />
+        <UFormField
+          label="Nouveau mot de passe"
+          name="password"
+        >
+          <UInput
+            v-model="password"
+            type="password"
+            placeholder="••••••••"
+            class="w-full"
+            required
+          />
         </UFormField>
 
-        <UAlert v-if="errorMsg" color="red" variant="soft" :title="errorMsg" />
-        <UAlert v-if="successMsg" color="green" variant="soft" :title="successMsg" />
+        <UAlert
+          v-if="errorMsg"
+          color="error"
+          variant="soft"
+          :title="errorMsg"
+        />
+        <UAlert
+          v-if="successMsg"
+          color="success"
+          variant="soft"
+          :title="successMsg"
+        />
 
-        <UButton v-if="!successMsg" type="submit" block class="w-full justify-center" :loading="loading" size="lg">
+        <UButton
+          v-if="!successMsg"
+          type="submit"
+          block
+          class="w-full justify-center"
+          :loading="loading"
+          size="lg"
+        >
           Mettre à jour
         </UButton>
       </form>

@@ -6,15 +6,6 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase'
   ],
 
-  supabase: {
-    redirectOptions: {
-      login: '/login',
-      callback: '/confirm',
-      exclude: ['/', '/register', '/forgot-password'],
-      cookieRedirect: false,
-    }
-  },
-
   devtools: {
     enabled: true
   },
@@ -33,6 +24,15 @@ export default defineNuxtConfig({
         commaDangle: 'never',
         braceStyle: '1tbs'
       }
+    }
+  },
+
+  supabase: {
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      exclude: ['/', '/register', '/forgot-password'],
+      cookieRedirect: false
     }
   }
 })

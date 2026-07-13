@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm'
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
   const userId = user?.sub
-  
+
   if (!user || !userId) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }

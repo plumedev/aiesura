@@ -11,12 +11,24 @@ const logout = async () => {
 <template>
   <div class="p-8 max-w-4xl mx-auto space-y-8">
     <div class="flex items-center justify-between">
-      <h1 class="text-3xl font-bold">Dashboard</h1>
+      <h1 class="text-3xl font-bold">
+        Dashboard
+      </h1>
       <div class="flex space-x-4">
-        <UButton to="/dashboard/accounts" color="primary" variant="soft" icon="i-lucide-wallet">
+        <UButton
+          to="/dashboard/accounts"
+          color="primary"
+          variant="soft"
+          icon="i-lucide-wallet"
+        >
           Mes Comptes
         </UButton>
-        <UButton color="gray" variant="ghost" icon="i-lucide-log-out" @click="logout">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          icon="i-lucide-log-out"
+          @click="logout"
+        >
           Déconnexion
         </UButton>
       </div>
@@ -24,12 +36,19 @@ const logout = async () => {
 
     <UCard>
       <template #header>
-        <h2 class="text-lg font-semibold">Bienvenue !</h2>
+        <h2 class="text-lg font-semibold">
+          Bienvenue !
+        </h2>
       </template>
       <div class="space-y-4">
         <p>Vous êtes connecté avec l'adresse :</p>
-        <UBadge size="lg" color="primary">{{ user?.email }}</UBadge>
-        
+        <UBadge
+          size="lg"
+          color="primary"
+        >
+          {{ user?.email }}
+        </UBadge>
+
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-4">
           Ceci est une route protégée par le middleware de `@nuxtjs/supabase`.
           Si vous vous déconnectez et essayez de revenir sur `/dashboard`, vous serez redirigé vers `/login`.
