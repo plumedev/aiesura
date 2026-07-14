@@ -2,7 +2,8 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'primary',
-      neutral: 'neutral'
+      neutral: 'neutral',
+      error: 'error'
     },
     button: {
       slots: {
@@ -18,7 +19,8 @@ export default defineAppConfig({
     },
     modal: {
       slots: {
-        content: 'rounded-md glass-panel sm:rounded-md !ring-0 !border-none !shadow-none'
+        content: 'rounded-md glass-panel sm:rounded-md !ring-0 !border-none !shadow-none',
+        overlay: 'bg-black/20 dark:bg-black/40'
       }
     },
     toast: {
@@ -48,8 +50,29 @@ export default defineAppConfig({
     },
     input: {
       slots: {
-        base: '!bg-[var(--color-bg-app)] !text-[var(--color-text-main)] !border !border-black/10 dark:!border-transparent !ring-0 !outline-none !shadow-none',
+        base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none',
         root: '!border-none !ring-0 !outline-none !shadow-none'
+      }
+    },
+    selectMenu: {
+      slots: {
+        base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none'
+      }
+    },
+    inputDate: {
+      slots: {
+        base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none'
+      }
+    },
+    textarea: {
+      slots: {
+        base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none',
+        root: '!border-none !ring-0 !outline-none !shadow-none'
+      }
+    },
+    tabs: {
+      slots: {
+        list: '!bg-white/50 dark:!bg-black/20 !border !border-black/10 dark:!border-white/10 !ring-0 !shadow-none'
       }
     }
   }

@@ -14,6 +14,10 @@
 
   /* Neutral text color */
   --color-neutral-900: #343434;
+
+  /* Error color (used for both Light and Dark themes for consistency and contrast) */
+  --color-error-400: #f2545b;
+  --color-error-500: #f2545b;
 }
 
 :root {
@@ -48,11 +52,11 @@ body {
 
 /* Utilitaires Glassmorphisme / Surfaces */
 .glass-panel {
-  background-color: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 
 .dark .glass-panel {
-  background-color: rgba(15, 80, 64, 0.3);
+  background-color: rgba(15, 80, 64, 0.3) !important;
 }
