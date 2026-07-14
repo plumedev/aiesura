@@ -140,162 +140,156 @@ const items = (row: { id: string, name: string, isMain: boolean }) => [
 
 <template>
   <UDashboardPanel id="accounts">
-    <template #header>
-      <UDashboardNavbar title="Mes Comptes">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
-    </template>
-
-    <template #body>
-      <div class="space-y-4 sm:space-y-6 max-w-5xl mx-auto w-full">
-
-    <UCard id="plop">
-      <template #header>
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full">
-          <UInput
-            v-model="newAccountName"
-            placeholder="Nom du nouveau compte (ex: Perso SG...)"
-            class="flex-1"
-            @keyup.enter="createAccount"
-          />
-          <UButton
-            icon="i-heroicons-plus"
-            label="Créer"
-            color="primary"
-            :loading="loading"
-            :disabled="!newAccountName.trim()"
-            class="w-full justify-center sm:w-auto"
-            @click="createAccount"
-          />
-        </div>
+    <UDashboardNavbar title="Mes Comptes">
+      <template #leading>
+        <UDashboardSidebarCollapse />
       </template>
-
-      <UTable
-        :columns="columns"
-        :data="accounts || []"
-      >
-        <template #name-cell="{ row }">
-          <div class="flex items-center gap-3">
-            <UIcon
-              :name="row.original.icon || 'i-heroicons-building-library'"
-              class="w-5 h-5 flex-shrink-0"
-              :class="`text-${row.original.color || 'blue'}-500`"
+    </UDashboardNavbar>
+    <div class="space-y-4 sm:space-y-6 max-w-5xl mx-auto w-full">
+      <UCard id="plop">
+        <template #header>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full">
+            <UInput
+              v-model="newAccountName"
+              placeholder="Nom du nouveau compte (ex: Perso SG...)"
+              class="flex-1"
+              @keyup.enter="createAccount"
             />
-            <span class="font-semibold">{{ row.original.name }}</span>
+            <UButton
+              icon="i-heroicons-plus"
+              label="Créer"
+              color="primary"
+              :loading="loading"
+              :disabled="!newAccountName.trim()"
+              class="w-full justify-center sm:w-auto"
+              @click="createAccount"
+            />
           </div>
         </template>
 
-        <template #isMain-cell="{ row }">
-          <div>
-            <UBadge
-              v-if="row.original.isMain"
-              color="warning"
-              variant="subtle"
-              icon="i-heroicons-star"
-            >
-              Principal
-            </UBadge>
-          </div>
-        </template>
-
-        <template #actions-cell="{ row }">
-          <div class="flex justify-end">
-            <UDropdownMenu
-              :items="items(row.original)"
-              :content="{ side: 'left', align: 'start' }"
-            >
-              <UButton
-                color="neutral"
-                variant="ghost"
-                icon="i-heroicons-ellipsis-horizontal-20-solid"
-              />
-            </UDropdownMenu>
-          </div>
-        </template>
-      </UTable>
-    </UCard>
-
-    <!-- Modal Édition -->
-    <UModal v-model:open="isEditOpen">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="text-lg font-semibold">
-              Modifier le compte
-            </h3>
-          </template>
-          <form
-            class="space-y-4"
-            @submit.prevent="updateAccount"
-          >
-            <UFormField label="Nom du compte">
-              <UInput
-                v-model="formState.name"
-                required
-                autofocus
-              />
-            </UFormField>
-            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
-              <UButton
-                label="Annuler"
-                color="neutral"
-                variant="ghost"
-                class="w-full justify-center sm:w-auto"
-                @click="closeEditModal"
-              />
-              <UButton
-                type="submit"
-                label="Sauvegarder"
-                color="primary"
-                :loading="loading"
-                class="w-full justify-center sm:w-auto"
-              />
-            </div>
-          </form>
-        </UCard>
-      </template>
-    </UModal>
-
-    <!-- Modal Suppression -->
-    <UModal v-model:open="isDeleteOpen">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="text-lg font-semibold text-red-500 flex items-center gap-2">
+        <UTable
+          :columns="columns"
+          :data="accounts || []"
+        >
+          <template #name-cell="{ row }">
+            <div class="flex items-center gap-3">
               <UIcon
-                name="i-heroicons-exclamation-triangle"
-                class="w-5 h-5"
+                :name="row.original.icon || 'i-heroicons-building-library'"
+                class="w-5 h-5 flex-shrink-0"
+                :class="`text-${row.original.color || 'blue'}-500`"
               />
-              Confirmer la suppression
-            </h3>
-          </template>
-          <div class="space-y-4">
-            <p class="text-gray-600 dark:text-gray-300">
-              Êtes-vous sûr de vouloir supprimer ce compte ? Toutes les dépenses, flux et règles de transferts qui y sont liés seront définitivement supprimés de la base de données.
-            </p>
-            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
-              <UButton
-                label="Annuler"
-                color="neutral"
-                variant="ghost"
-                class="w-full justify-center sm:w-auto"
-                @click="closeDeleteModal"
-              />
-              <UButton
-                label="Oui, supprimer"
-                color="error"
-                :loading="loading"
-                class="w-full justify-center sm:w-auto"
-                @click="deleteAccount"
-              />
+              <span class="font-semibold">{{ row.original.name }}</span>
             </div>
-          </div>
-        </UCard>
-      </template>
-    </UModal>
-      </div>
-    </template>
+          </template>
+
+          <template #isMain-cell="{ row }">
+            <div>
+              <UBadge
+                v-if="row.original.isMain"
+                color="warning"
+                variant="subtle"
+                icon="i-heroicons-star"
+              >
+                Principal
+              </UBadge>
+            </div>
+          </template>
+
+          <template #actions-cell="{ row }">
+            <div class="flex justify-end">
+              <UDropdownMenu
+                :items="items(row.original)"
+                :content="{ side: 'left', align: 'start' }"
+              >
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-ellipsis-horizontal-20-solid"
+                />
+              </UDropdownMenu>
+            </div>
+          </template>
+        </UTable>
+      </UCard>
+
+      <!-- Modal Édition -->
+      <UModal v-model:open="isEditOpen">
+        <template #content>
+          <UCard>
+            <template #header>
+              <h3 class="text-lg font-semibold">
+                Modifier le compte
+              </h3>
+            </template>
+            <form
+              class="space-y-4"
+              @submit.prevent="updateAccount"
+            >
+              <UFormField label="Nom du compte">
+                <UInput
+                  v-model="formState.name"
+                  required
+                  autofocus
+                />
+              </UFormField>
+              <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
+                <UButton
+                  label="Annuler"
+                  color="neutral"
+                  variant="ghost"
+                  class="w-full justify-center sm:w-auto"
+                  @click="closeEditModal"
+                />
+                <UButton
+                  type="submit"
+                  label="Sauvegarder"
+                  color="primary"
+                  :loading="loading"
+                  class="w-full justify-center sm:w-auto"
+                />
+              </div>
+            </form>
+          </UCard>
+        </template>
+      </UModal>
+
+      <!-- Modal Suppression -->
+      <UModal v-model:open="isDeleteOpen">
+        <template #content>
+          <UCard>
+            <template #header>
+              <h3 class="text-lg font-semibold text-red-500 flex items-center gap-2">
+                <UIcon
+                  name="i-heroicons-exclamation-triangle"
+                  class="w-5 h-5"
+                />
+                Confirmer la suppression
+              </h3>
+            </template>
+            <div class="space-y-4">
+              <p class="text-gray-600 dark:text-gray-300">
+                Êtes-vous sûr de vouloir supprimer ce compte ? Toutes les dépenses, flux et règles de transferts qui y sont liés seront définitivement supprimés de la base de données.
+              </p>
+              <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
+                <UButton
+                  label="Annuler"
+                  color="neutral"
+                  variant="ghost"
+                  class="w-full justify-center sm:w-auto"
+                  @click="closeDeleteModal"
+                />
+                <UButton
+                  label="Oui, supprimer"
+                  color="error"
+                  :loading="loading"
+                  class="w-full justify-center sm:w-auto"
+                  @click="deleteAccount"
+                />
+              </div>
+            </div>
+          </UCard>
+        </template>
+      </UModal>
+    </div>
   </UDashboardPanel>
 </template>

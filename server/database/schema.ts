@@ -18,6 +18,19 @@ export const accounts = pgTable('accounts', {
   createdAt: timestamp('created_at').defaultNow().notNull()
 })
 
+export const transactions = pgTable('transactions', {
+  id: uuid('id').primaryKey().defaultRandom().notNull(),
+  userId: uuid('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  accountId: uuid('account_id').notNull().references(() => accounts.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(), // 'income' | 'expense'
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  name: text('name').notNull(),
+  frequency: text('frequency').notNull(), // 'once' | 'monthly' | 'quarterly' | 'yearly'
+  startDate: timestamp('start_date').notNull(),
+  endDate: timestamp('end_date'),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+})
+
 export const monthlyFlows = pgTable('monthly_flows', {
   id: uuid('id').primaryKey().defaultRandom().notNull(),
   userId: uuid('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
@@ -55,6 +68,7 @@ export const accountsRelations = relations(accounts, ({ many, one }) => ({
     fields: [accounts.userId],
     references: [profiles.id]
   }),
+  transactions: many(transactions),
   monthlyFlows: many(monthlyFlows),
   outgoingTransferRules: many(transferRules, { relationName: 'outgoingRules' }),
   incomingTransferRules: many(transferRules, { relationName: 'incomingRules' })
@@ -66,6 +80,17 @@ export const monthlyFlowsRelations = relations(monthlyFlows, ({ one, many }) => 
     references: [accounts.id]
   }),
   transferRuleFlows: many(transferRuleFlows)
+}))
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  account: one(accounts, {
+    fields: [transactions.accountId],
+    references: [accounts.id]
+  }),
+  user: one(profiles, {
+    fields: [transactions.userId],
+    references: [profiles.id]
+  })
 }))
 
 export const transferRulesRelations = relations(transferRules, ({ one, many }) => ({
