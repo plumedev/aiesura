@@ -1,0 +1,9 @@
+- [ ] Créer `layouts/dashboard.vue` en utilisant `UDashboardLayout`
+- [ ] Configurer les composants officiels (`UDashboardSidebar`, `UDashboardNavbar`) en s'inspirant de nuxt-ui-templates
+- [ ] Configurer l'état global `useState` pour le menu mobile
+- [ ] Créer `pages/dashboard/index.vue` (KPIs, Graphiques mockés, Quick actions)
+- [ ] Intégrer `accounts.vue` dans le nouveau layout
+- [ ] Créer le squelette de `pages/dashboard/flows.vue`
+- [ ] Créer le squelette de `pages/dashboard/rules.vue`
+- [ ] Créer le squelette de `pages/dashboard/settings.vue`
+- [ ] Passer le lint et le typecheck

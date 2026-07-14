@@ -25,55 +25,14 @@ useSeoMeta({
   ogImage: 'https://ui.nuxt.com/assets/templates/nuxt/starter-light.png',
   twitterCard: 'summary_large_image'
 })
-
-const user = useSupabaseUser()
 </script>
 
 <template>
   <UApp>
-    <UHeader>
-      <template #left>
-        <NuxtLink to="/">
-          <AppLogo class="w-auto h-6 shrink-0" />
-        </NuxtLink>
-      </template>
+    <NuxtLoadingIndicator />
 
-      <template #right>
-        <UButton
-          v-if="user"
-          to="/dashboard"
-          icon="i-lucide-layout-dashboard"
-          label="Dashboard"
-          color="primary"
-          variant="soft"
-        />
-        <UButton
-          v-else
-          to="/login"
-          icon="i-lucide-user"
-          label="Se connecter"
-          color="primary"
-          variant="solid"
-        />
-
-        <UColorModeButton />
-      </template>
-    </UHeader>
-
-    <UMain>
+    <NuxtLayout>
       <NuxtPage />
-    </UMain>
-
-    <USeparator icon="i-simple-icons-nuxtdotjs" />
-
-    <UFooter>
-      <template #left>
-        <p class="text-sm text-muted">
-          Built with Nuxt UI • © {{ new Date().getFullYear() }}
-        </p>
-      </template>
-
-      <template #right />
-    </UFooter>
+    </NuxtLayout>
   </UApp>
 </template>

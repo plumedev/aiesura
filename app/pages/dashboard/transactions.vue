@@ -1,13 +1,11 @@
 <script setup lang="ts">
-const { isNotificationsSlideoverOpen } = useDashboard()
-
 definePageMeta({ layout: 'dashboard' })
 </script>
 
 <template>
-  <UDashboardPanel id="home">
+  <UDashboardPanel id="transactions">
     <template #header>
-      <UDashboardNavbar title="Vue d'ensemble">
+      <UDashboardNavbar title="Transactions">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -16,7 +14,7 @@ definePageMeta({ layout: 'dashboard' })
 
     <template #body>
       <div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-        <p>Page Vue d'ensemble (à implémenter)</p>
+        <p>Page Transactions (à implémenter)</p>
       </div>
     </template>
   </UDashboardPanel>
