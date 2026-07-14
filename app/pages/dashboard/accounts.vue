@@ -1,4 +1,6 @@
 <script setup lang="ts">
+definePageMeta({ layout: 'dashboard' })
+
 const { data: accounts, refresh } = await useFetch('/api/accounts')
 const toast = useToast()
 
@@ -137,24 +139,17 @@ const items = (row: { id: string, name: string, isMain: boolean }) => [
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-8">
-    <div class="mb-2 sm:mb-4">
-      <UButton
-        to="/dashboard"
-        color="neutral"
-        variant="ghost"
-        icon="i-lucide-arrow-left"
-        class="-ml-2 sm:ml-0"
-      >
-        Retour au Dashboard
-      </UButton>
-    </div>
+  <UDashboardPanel id="accounts">
+    <template #header>
+      <UDashboardNavbar title="Mes Comptes">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+      </UDashboardNavbar>
+    </template>
 
-    <div class="flex items-center justify-between mb-2 sm:mb-6">
-      <h1 class="text-2xl sm:text-3xl font-bold">
-        Mes Comptes
-      </h1>
-    </div>
+    <template #body>
+      <div class="space-y-4 sm:space-y-6 max-w-5xl mx-auto w-full">
 
     <UCard id="plop">
       <template #header>
@@ -300,5 +295,7 @@ const items = (row: { id: string, name: string, isMain: boolean }) => [
         </UCard>
       </template>
     </UModal>
-  </div>
+      </div>
+    </template>
+  </UDashboardPanel>
 </template>
