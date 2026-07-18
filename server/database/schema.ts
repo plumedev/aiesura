@@ -45,6 +45,18 @@ export const monthlyFlows = pgTable('monthly_flows', {
   createdAt: timestamp('created_at').defaultNow().notNull()
 })
 
+export const transactionIterations = pgTable('transaction_iterations', {
+  id: uuid('id').primaryKey().defaultRandom().notNull(),
+  transactionId: uuid('transaction_id').notNull().references(() => transactions.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  executionDate: timestamp('execution_date').notNull(),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  name: text('name').notNull(),
+  type: text('type').notNull(), // 'income' | 'expense'
+  isModified: boolean('is_modified').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+})
+
 export const transferRules = pgTable('transfer_rules', {
   id: uuid('id').primaryKey().defaultRandom().notNull(),
   userId: uuid('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
@@ -82,13 +94,25 @@ export const monthlyFlowsRelations = relations(monthlyFlows, ({ one, many }) => 
   transferRuleFlows: many(transferRuleFlows)
 }))
 
-export const transactionsRelations = relations(transactions, ({ one }) => ({
+export const transactionsRelations = relations(transactions, ({ one, many }) => ({
   account: one(accounts, {
     fields: [transactions.accountId],
     references: [accounts.id]
   }),
   user: one(profiles, {
     fields: [transactions.userId],
+    references: [profiles.id]
+  }),
+  iterations: many(transactionIterations)
+}))
+
+export const transactionIterationsRelations = relations(transactionIterations, ({ one }) => ({
+  transaction: one(transactions, {
+    fields: [transactionIterations.transactionId],
+    references: [transactions.id]
+  }),
+  user: one(profiles, {
+    fields: [transactionIterations.userId],
     references: [profiles.id]
   })
 }))

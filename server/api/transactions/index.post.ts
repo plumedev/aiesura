@@ -1,7 +1,8 @@
 import { db } from '~~/server/database/db'
-import { transactions } from '~~/server/database/schema'
+import { transactions, transactionIterations } from '~~/server/database/schema'
 import { serverSupabaseUser } from '#supabase/server'
 import { z } from 'zod'
+import { generateIterations } from '~~/server/utils/generateIterations'
 
 const transactionSchema = z.object({
   accountId: z.string().uuid(),
@@ -48,5 +49,27 @@ export default defineEventHandler(async (event) => {
     endDate: data.endDate ? new Date(data.endDate) : null
   }).returning()
 
-  return newTransaction[0]
+  const tx = newTransaction[0]
+
+  if (!tx) {
+    throw createError({ statusCode: 500, message: 'Erreur lors de la création de la transaction' })
+  }
+
+  // Générer et persister les itérations planifiées
+  const iterationsToInsert = generateIterations({
+    id: tx.id,
+    userId,
+    name: tx.name,
+    type: tx.type,
+    amount: tx.amount,
+    frequency: tx.frequency as 'once' | 'monthly' | 'quarterly' | 'yearly',
+    startDate: tx.startDate,
+    endDate: tx.endDate ?? null
+  })
+
+  if (iterationsToInsert.length > 0) {
+    await db.insert(transactionIterations).values(iterationsToInsert)
+  }
+
+  return tx
 })

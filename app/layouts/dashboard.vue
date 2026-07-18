@@ -98,6 +98,10 @@ onMounted(async () => {
           orientation="vertical"
           tooltip
           popover
+          :ui="{
+            link: 'before:!hidden text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 aria-[current=page]:!text-white aria-[current=page]:!bg-[#0C3C32] transition-all rounded-md',
+            linkLeadingIcon: 'text-gray-500 dark:text-white group-hover:text-gray-700 dark:group-hover:text-white/80 group-aria-[current=page]:!text-white'
+          }"
         />
 
         <UNavigationMenu
@@ -106,6 +110,10 @@ onMounted(async () => {
           orientation="vertical"
           tooltip
           class="mt-auto"
+          :ui="{
+            link: 'before:!hidden text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 aria-[current=page]:!text-white aria-[current=page]:!bg-[#0C3C32] transition-all rounded-md',
+            linkLeadingIcon: 'text-gray-500 dark:text-white group-hover:text-gray-700 dark:group-hover:text-white/80 group-aria-[current=page]:!text-white'
+          }"
         />
       </template>
 
