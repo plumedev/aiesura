@@ -14,6 +14,7 @@ export interface TransactionIteration {
   name: string
   type: TransactionType
   isModified: boolean
+  transactionStartDate: string
 }
 
 export interface TransactionWithIterations {

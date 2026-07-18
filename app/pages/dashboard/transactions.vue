@@ -18,13 +18,25 @@ const isModalOpen = ref(false)
 const search = ref('')
 const sorting = ref([])
 
+// Render function pour les en-têtes triables — évite la duplication ×6
+const sortableHeader = (label: string) => ({ column }: { column: { getIsSorted: () => false | 'asc' | 'desc', toggleSorting: (desc: boolean) => void } }) =>
+  h(resolveComponent('UButton'), {
+    variant: 'ghost',
+    color: 'neutral',
+    class: '-ml-2.5 font-semibold text-gray-900 dark:text-white',
+    icon: column.getIsSorted()
+      ? column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up'
+      : 'i-heroicons-arrows-up-down',
+    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+  }, () => label)
+
 const columns = [
-  { accessorKey: 'name', header: 'Libellé' },
-  { accessorKey: 'startDate', header: 'Date' },
-  { accessorKey: 'frequency', header: 'Fréquence' },
-  { accessorKey: 'type', header: 'Type' },
-  { accessorKey: 'account', header: 'Compte' },
-  { accessorKey: 'amount', header: 'Montant' },
+  { accessorKey: 'name', header: sortableHeader('Libellé') },
+  { accessorKey: 'startDate', header: sortableHeader('Date') },
+  { accessorKey: 'frequency', header: sortableHeader('Fréquence') },
+  { accessorKey: 'type', header: sortableHeader('Type') },
+  { accessorKey: 'account', header: sortableHeader('Compte') },
+  { accessorKey: 'amount', header: sortableHeader('Montant') },
   { id: 'actions', header: '' }
 ]
 
@@ -73,6 +85,14 @@ function handleSuccess() {
   refresh()
 }
 
+const closeModal = () => {
+  isModalOpen.value = false
+}
+
+const openModal = () => {
+  isModalOpen.value = true
+}
+
 const getRow = (row: unknown): Record<string, unknown> => (row as { original?: Record<string, unknown> }).original || (row as Record<string, unknown>)
 
 const getDropdownItems = (row: unknown) => [
@@ -94,25 +114,7 @@ const getDropdownItems = (row: unknown) => [
     }
   ]
 ]
-
-const formatDate = (dateString: string) => {
-  const d = new Date(dateString)
-  return d.toLocaleDateString('fr-FR')
-}
-
-const formatFrequency = (freq: string) => {
-  const map: Record<string, string> = {
-    once: 'Unique',
-    monthly: 'Mensuel',
-    quarterly: 'Trimestriel',
-    yearly: 'Annuel'
-  }
-  return map[freq] || freq
-}
-
-const openModal = () => {
-  isModalOpen.value = true
-}
+// formatFrequency et TRANSACTION_TYPE_LABELS sont auto-importés depuis ~/utils
 </script>
 
 <template>
@@ -178,73 +180,7 @@ const openModal = () => {
           sticky
           :ui="{ thead: 'bg-gray-50/90 dark:bg-[#11463B]/90 backdrop-blur-md' }"
         >
-          <!-- Headers -->
-          <template #name-header="{ column }">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
-              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-            >
-              {{ column.columnDef.header }}
-            </UButton>
-          </template>
-          <template #startDate-header="{ column }">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
-              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-            >
-              {{ column.columnDef.header }}
-            </UButton>
-          </template>
-          <template #frequency-header="{ column }">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
-              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-            >
-              {{ column.columnDef.header }}
-            </UButton>
-          </template>
-          <template #type-header="{ column }">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
-              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-            >
-              {{ column.columnDef.header }}
-            </UButton>
-          </template>
-          <template #account-header="{ column }">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
-              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-            >
-              {{ column.columnDef.header }}
-            </UButton>
-          </template>
-          <template #amount-header="{ column }">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
-              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-            >
-              {{ column.columnDef.header }}
-            </UButton>
-          </template>
+          <!-- Les headers triables sont définis via sortableHeader() dans le script -->
           <!-- Cells -->
           <template #startDate-cell="{ row }">
             {{ formatDate(getRow(row).startDate as string) }}
@@ -261,7 +197,7 @@ const openModal = () => {
               :color="getRow(row).type === 'income' ? 'success' : 'error'"
               variant="subtle"
             >
-              {{ getRow(row).type === 'income' ? 'Revenu' : 'Dépense' }}
+              {{ TRANSACTION_TYPE_LABELS[getRow(row).type as 'income' | 'expense'] }}
             </UBadge>
           </template>
           <template #account-cell="{ row }">
@@ -294,7 +230,7 @@ const openModal = () => {
       </template>
       <template #body>
         <TransactionsTransactionForm
-          @close="isModalOpen = false"
+          @close="closeModal"
           @success="handleSuccess"
         />
       </template>

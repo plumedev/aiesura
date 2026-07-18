@@ -43,3 +43,41 @@ Bien que les "slash commands" natives de l'interface soient limitées, je **dois
 ## Design & UI
 *   **Couleurs des conteneurs :** Le fond des conteneurs (cartes, tableaux, etc.) doit être `#F1F5F3` en mode light et `#0C3C32` en mode dark pour conserver la cohérence visuelle du projet.
 *   **Design System (`design.md`) :** Chaque fois qu'une nouvelle convention de design est introduite ou modifiée (ex: style de tableau, header sticky, couleur de bouton), je DOIS demander à l'utilisateur s'il faut mettre à jour le fichier `openspec/design.md` pour refléter ce changement.
+
+## Conventions API Serveur (Nitro / Drizzle)
+
+*   **Authentification centralisée :** Chaque handler API DOIT utiliser `requireUser(event)` depuis `~~/server/utils/auth` pour récupérer l'utilisateur et son `userId`. Il est INTERDIT de dupliquer la logique `user?.id || user?.sub` directement dans un handler.
+    ```ts
+    import { requireUser } from '~~/server/utils/auth'
+
+    export default defineEventHandler(async (event) => {
+      const { userId } = await requireUser(event)
+      // ...
+    })
+    ```
+
+*   **Validation des body avec Zod :** Tout handler qui reçoit un body DOIT valider les données avec `zod` + `readValidatedBody`. L'utilisation de validations manuelles (`if (!name)`) est interdite. Le schéma Zod DOIT être déclaré en dehors du handler (au niveau module) pour éviter de le recréer à chaque requête.
+    ```ts
+    const mySchema = z.object({ name: z.string().min(1) })
+
+    export default defineEventHandler(async (event) => {
+      const body = await readValidatedBody(event, body => mySchema.safeParse(body))
+      if (!body.success) throw createError({ statusCode: 400, message: 'Données invalides', data: body.error.issues })
+      // ...
+    })
+    ```
+
+*   **Ownership des ressources :** Toute requête de modification ou suppression DOIT inclure `eq(table.userId, userId)` dans la clause `where` de Drizzle pour garantir qu'un utilisateur ne peut accéder qu'à ses propres données.
+
+## Conventions Frontend (Vue 3 / Utils partagés)
+
+*   **Formatage centralisé :** Les fonctions de formatage et les constantes de labels DOIVENT être définies dans `app/utils/index.ts` et non re-déclarées localement dans une page ou un composant. Les fonctions disponibles sont :
+    *   `formatDate(date)` — date en `jj/mm/aaaa` locale française
+    *   `formatFrequency(freq)` — traduit `'monthly'` → `'Mensuel'`, etc.
+    *   `formatAmount(amount, type?)` — formate en euros avec signe `+`/`-`
+    *   `TRANSACTION_TYPE_LABELS` — record `{ income: 'Revenu', expense: 'Dépense' }`
+    *   `FREQUENCY_LABELS` — record de toutes les fréquences
+
+*   **Headers de tableaux triables :** Pour les colonnes triables dans `UTable`, utiliser une render function `sortableHeader(label)` définie dans le `<script setup>` plutôt que de dupliquer un template `#xxx-header` par colonne. Voir `app/pages/dashboard/transactions.vue` comme référence.
+
+*   **Pas de types fantômes :** Le fichier `app/types/index.d.ts` ne doit contenir que des types réellement utilisés dans le projet. Les résidus du template de base Nuxt (User, Mail, Member, Stat, Sale…) ont été supprimés.

@@ -1,24 +1,27 @@
-import { serverSupabaseUser } from '#supabase/server'
 import { db } from '~~/server/database/db'
 import { accounts } from '~~/server/database/schema'
 import { eq } from 'drizzle-orm'
+import { z } from 'zod'
+import { requireUser } from '~~/server/utils/auth'
+
+const accountSchema = z.object({
+  name: z.string().min(1, 'Le nom est requis'),
+  icon: z.string().optional(),
+  color: z.string().optional()
+})
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-  const userId = user?.sub
+  const { userId } = await requireUser(event)
 
-  if (!user || !userId) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  const body = await readValidatedBody(event, body => accountSchema.safeParse(body))
+
+  if (!body.success) {
+    throw createError({ statusCode: 400, message: 'Données invalides', data: body.error.issues })
   }
 
-  const body = await readBody(event)
-  const { name, icon, color } = body
+  const { name, icon, color } = body.data
 
-  if (!name) {
-    throw createError({ statusCode: 400, statusMessage: 'Name is required' })
-  }
-
-  // Vérifier s'il a déjà des comptes
+  // Vérifier s'il a déjà des comptes pour définir isMain automatiquement
   const existingAccounts = await db.select().from(accounts).where(eq(accounts.userId, userId))
   const isFirstAccount = existingAccounts.length === 0
 

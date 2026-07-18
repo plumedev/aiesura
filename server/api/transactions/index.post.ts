@@ -1,8 +1,8 @@
 import { db } from '~~/server/database/db'
 import { transactions, transactionIterations } from '~~/server/database/schema'
-import { serverSupabaseUser } from '#supabase/server'
 import { z } from 'zod'
 import { generateIterations } from '~~/server/utils/generateIterations'
+import { requireUser } from '~~/server/utils/auth'
 
 const transactionSchema = z.object({
   accountId: z.string().uuid(),
@@ -15,16 +15,7 @@ const transactionSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-
-  const userId = user?.id || (user as { sub?: string })?.sub
-
-  if (!user || !userId) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non autorisé'
-    })
-  }
+  const { userId } = await requireUser(event)
 
   const body = await readValidatedBody(event, body => transactionSchema.safeParse(body))
 
@@ -39,7 +30,7 @@ export default defineEventHandler(async (event) => {
   const data = body.data
 
   const newTransaction = await db.insert(transactions).values({
-    userId: userId,
+    userId,
     accountId: data.accountId,
     type: data.type,
     amount: data.amount.toString(),

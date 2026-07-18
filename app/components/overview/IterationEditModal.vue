@@ -12,12 +12,16 @@ const emit = defineEmits<{
 
 const toast = useToast()
 
-// Formulaire initialisé depuis l'itération reçue
+// Formulaire initialisé depuis l'itération reçue.
+// Si l'itération n'a pas été modifiée, on préremplit avec la date de la transaction par défaut (transactionStartDate).
+// Sinon, on prend sa propre date d'exécution (executionDate).
+// L'input HTML type="date" requiert le format YYYY-MM-DD (géré par le helper formatDateForInput).
+// props.iteration.executionDate contient la date planifiée par défaut (si non modifiée) ou la date modifiée (si déjà modifiée).
 const form = reactive({
   name: props.iteration.name,
   amount: props.iteration.amount,
   type: props.iteration.type as 'income' | 'expense',
-  executionDate: props.iteration.executionDate
+  executionDate: formatDateForInput(props.iteration.executionDate)
 })
 
 const typeOptions = [

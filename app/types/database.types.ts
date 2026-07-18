@@ -1,3 +1,6 @@
+// Ce fichier est conservé pour la compatibilité avec le module @nuxtjs/supabase.
+// Les types réels de la base de données sont définis dans server/database/schema.ts (Drizzle ORM).
+
 export type Json
   = | string
     | number

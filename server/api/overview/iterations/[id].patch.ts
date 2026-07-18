@@ -1,8 +1,8 @@
 import { db } from '~~/server/database/db'
 import { transactionIterations } from '~~/server/database/schema'
-import { serverSupabaseUser } from '#supabase/server'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { requireUser } from '~~/server/utils/auth'
 
 const patchSchema = z.object({
   name: z.string().min(1).optional(),
@@ -12,12 +12,7 @@ const patchSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-  const userId = user?.id || (user as { sub?: string })?.sub
-
-  if (!user || !userId) {
-    throw createError({ statusCode: 401, message: 'Non autorisé' })
-  }
+  const { userId } = await requireUser(event)
 
   const id = getRouterParam(event, 'id')
   if (!id) {
