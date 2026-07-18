@@ -1,15 +1,10 @@
-import { serverSupabaseUser } from '#supabase/server'
 import { db } from '~~/server/database/db'
 import { accounts } from '~~/server/database/schema'
 import { eq, and } from 'drizzle-orm'
+import { requireUser } from '~~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-  const userId = user?.sub
-
-  if (!user || !userId) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  const { userId } = await requireUser(event)
 
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'ID is required' })

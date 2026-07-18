@@ -1,15 +1,10 @@
 import { db } from '~~/server/database/db'
 import { transactionIterations } from '~~/server/database/schema'
-import { serverSupabaseUser } from '#supabase/server'
 import { and, eq, between } from 'drizzle-orm'
+import { requireUser } from '~~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-  const userId = user?.id || (user as { sub?: string })?.sub
-
-  if (!user || !userId) {
-    throw createError({ statusCode: 401, message: 'Non autorisé' })
-  }
+  const { userId } = await requireUser(event)
 
   const { startDate, endDate } = getQuery(event)
 

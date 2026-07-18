@@ -5,46 +5,16 @@ const toast = useToast()
 
 const open = ref(false)
 
-const links = [[{
-  label: 'Vue d\'ensemble',
-  icon: 'i-heroicons-home',
-  to: '/dashboard',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Comptes',
-  icon: 'i-heroicons-building-library',
-  to: '/dashboard/accounts',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Transactions',
-  icon: 'i-heroicons-banknotes',
-  to: '/dashboard/transactions',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Flux Mensuels',
-  icon: 'i-heroicons-chart-bar',
-  to: '/dashboard/flows',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Règles de virement',
-  icon: 'i-heroicons-arrows-right-left',
-  to: '/dashboard/rules',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Paramètres',
-  to: '/dashboard/settings',
-  icon: 'i-heroicons-cog-8-tooth'
-}], []] satisfies NavigationMenuItem[][]
+const navItems = [
+  { label: 'Vue d\'ensemble', icon: 'i-heroicons-home', to: '/dashboard' },
+  { label: 'Comptes', icon: 'i-heroicons-building-library', to: '/dashboard/accounts' },
+  { label: 'Transactions', icon: 'i-heroicons-banknotes', to: '/dashboard/transactions' },
+  { label: 'Flux Mensuels', icon: 'i-heroicons-chart-bar', to: '/dashboard/flows' },
+  { label: 'Règles de virement', icon: 'i-heroicons-arrows-right-left', to: '/dashboard/rules' },
+  { label: 'Paramètres', icon: 'i-heroicons-cog-8-tooth', to: '/dashboard/settings' }
+].map(item => ({ ...item, onSelect: () => { open.value = false } })) satisfies NavigationMenuItem[]
+
+const links = [navItems, []] satisfies NavigationMenuItem[][]
 
 onMounted(async () => {
   const cookie = useCookie('cookie-consent')

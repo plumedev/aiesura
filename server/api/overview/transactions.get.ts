@@ -1,15 +1,10 @@
 import { db } from '~~/server/database/db'
 import { transactions, transactionIterations, accounts } from '~~/server/database/schema'
-import { serverSupabaseUser } from '#supabase/server'
 import { and, eq, between, ilike, inArray, gte, lte, gt, lt, asc } from 'drizzle-orm'
+import { requireUser } from '~~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-  const userId = user?.id || (user as { sub?: string })?.sub
-
-  if (!user || !userId) {
-    throw createError({ statusCode: 401, message: 'Non autorisé' })
-  }
+  const { userId } = await requireUser(event)
 
   const query = getQuery(event)
   const {
@@ -89,6 +84,7 @@ export default defineEventHandler(async (event) => {
       name: string
       type: string
       isModified: boolean
+      transactionStartDate: string
     }>
   }>()
 
@@ -109,7 +105,8 @@ export default defineEventHandler(async (event) => {
       amount: Number(row.transaction_iterations.amount),
       name: row.transaction_iterations.name,
       type: row.transaction_iterations.type,
-      isModified: row.transaction_iterations.isModified
+      isModified: row.transaction_iterations.isModified,
+      transactionStartDate: row.transactions.startDate.toISOString()
     })
   }
 

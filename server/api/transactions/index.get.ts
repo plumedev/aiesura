@@ -1,19 +1,10 @@
 import { db } from '~~/server/database/db'
 import { transactions } from '~~/server/database/schema'
 import { eq, desc } from 'drizzle-orm'
-import { serverSupabaseUser } from '#supabase/server'
+import { requireUser } from '~~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-
-  const userId = user?.id || (user as { sub?: string })?.sub
-
-  if (!user || !userId) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non autorisé'
-    })
-  }
+  const { userId } = await requireUser(event)
 
   const userTransactions = await db.query.transactions.findMany({
     where: eq(transactions.userId, userId),

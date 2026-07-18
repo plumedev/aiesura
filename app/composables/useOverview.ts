@@ -3,9 +3,9 @@ import type {
   OverviewSummary,
   OverviewFilters,
   TransactionWithIterations,
-  TransactionType,
   OverviewTransactionsResponse
 } from '~/types/overview'
+import { formatAmount } from '~/utils'
 
 export const useOverview = () => {
   // --- Période ---
@@ -118,15 +118,7 @@ export const useOverview = () => {
     hasMore,
     loadMore,
     refreshAll,
-    // Formatage
-    formatAmount: (amount: number, type?: TransactionType) => {
-      const formatted = new Intl.NumberFormat('fr-FR', {
-        style: 'currency',
-        currency: 'EUR'
-      }).format(Math.abs(amount))
-      if (type === 'expense') return `-${formatted}`
-      if (type === 'income') return `+${formatted}`
-      return formatted
-    }
+    // Formatage (réexporté depuis utils pour usage dans les templates)
+    formatAmount
   }
 }

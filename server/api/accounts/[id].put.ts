@@ -1,21 +1,29 @@
-import { serverSupabaseUser } from '#supabase/server'
 import { db } from '~~/server/database/db'
 import { accounts } from '~~/server/database/schema'
 import { eq, and } from 'drizzle-orm'
+import { z } from 'zod'
+import { requireUser } from '~~/server/utils/auth'
+
+const updateAccountSchema = z.object({
+  name: z.string().min(1).optional(),
+  icon: z.string().optional(),
+  color: z.string().optional(),
+  isMain: z.boolean().optional()
+})
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-  const userId = user?.sub
-
-  if (!user || !userId) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  const { userId } = await requireUser(event)
 
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'ID is required' })
 
-  const body = await readBody(event)
-  const { name, icon, color, isMain } = body
+  const body = await readValidatedBody(event, body => updateAccountSchema.safeParse(body))
+
+  if (!body.success) {
+    throw createError({ statusCode: 400, message: 'Données invalides', data: body.error.issues })
+  }
+
+  const { name, icon, color, isMain } = body.data
 
   // Si on passe ce compte en principal, on réinitialise les autres
   if (isMain === true) {
