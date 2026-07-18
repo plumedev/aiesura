@@ -2,6 +2,19 @@
 import { z } from 'zod'
 import { CalendarDate } from '@internationalized/date'
 
+const props = defineProps<{
+  transaction?: {
+    id: string
+    name: string
+    amount: string | number
+    accountId: string
+    type: 'income' | 'expense'
+    frequency: 'once' | 'monthly' | 'quarterly' | 'yearly'
+    startDate: string
+    endDate: string | null
+  }
+}>()
+
 const emit = defineEmits(['close', 'success'])
 
 const toast = useToast()
@@ -25,18 +38,45 @@ const schema = z.object({
   path: ['endDate']
 })
 
+const isEdition = computed(() => !!props.transaction)
+const showConfirmModal = ref(false)
+const updateMode = ref<'all' | 'future' | 'single'>('all')
+
 const state = reactive({
   name: '',
-  amount: undefined,
+  amount: undefined as number | undefined,
   accountId: accounts.value?.[0]?.id || '',
-  type: 'expense' as const,
-  frequency: 'once' as const,
+  type: 'expense' as 'income' | 'expense',
+  frequency: 'once' as 'once' | 'monthly' | 'quarterly' | 'yearly',
   startDate: new Date(),
   hasEndDate: true,
   endDate: new Date() as Date | undefined
 })
 
+watch(() => props.transaction, (newTx) => {
+  if (newTx) {
+    state.name = newTx.name
+    state.amount = Number(newTx.amount)
+    state.accountId = newTx.accountId
+    state.type = newTx.type
+    state.frequency = newTx.frequency
+    state.startDate = new Date(newTx.startDate)
+    state.hasEndDate = !!newTx.endDate
+    state.endDate = newTx.endDate ? new Date(newTx.endDate) : undefined
+  } else {
+    state.name = ''
+    state.amount = undefined
+    state.accountId = accounts.value?.[0]?.id || ''
+    state.type = 'expense'
+    state.frequency = 'once'
+    state.startDate = new Date()
+    state.hasEndDate = true
+    state.endDate = new Date()
+  }
+}, { immediate: true })
+
 const loading = ref(false)
+const isSubmitting = ref(false)
 
 type DateValue = { year: number, month: number, day: number }
 
@@ -70,19 +110,36 @@ const dateModel = computed({
   }
 })
 
-async function onSubmit(event: import('@nuxt/ui').FormSubmitEvent<Record<string, unknown>>) {
+async function executeSubmit(mode?: 'all' | 'future' | 'single') {
   loading.value = true
+  if (mode !== 'single') {
+    isSubmitting.value = true
+  }
   try {
-    await $fetch('/api/transactions', {
-      method: 'POST',
-      body: {
-        ...event.data,
-        amount: Number(event.data.amount),
-        startDate: (event.data.startDate as Date).toISOString(),
-        endDate: (event.data.hasEndDate && event.data.endDate) ? (event.data.endDate as Date).toISOString() : null
-      }
-    })
-    toast.add({ title: 'Transaction ajoutée', color: 'success' })
+    const payload = {
+      name: state.name,
+      amount: Number(state.amount),
+      accountId: state.accountId,
+      type: state.type,
+      frequency: state.frequency,
+      startDate: state.startDate.toISOString(),
+      endDate: (state.hasEndDate && state.endDate) ? state.endDate.toISOString() : null,
+      updateMode: mode
+    }
+
+    if (isEdition.value) {
+      await $fetch(`/api/transactions/${props.transaction!.id}`, {
+        method: 'PATCH',
+        body: payload
+      })
+      toast.add({ title: 'Transaction mise à jour', color: 'success' })
+    } else {
+      await $fetch('/api/transactions', {
+        method: 'POST',
+        body: payload
+      })
+      toast.add({ title: 'Transaction ajoutée', color: 'success' })
+    }
     emit('success')
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
@@ -93,7 +150,22 @@ async function onSubmit(event: import('@nuxt/ui').FormSubmitEvent<Record<string,
     })
   } finally {
     loading.value = false
+    isSubmitting.value = false
+    showConfirmModal.value = false
   }
+}
+
+async function onSubmit() {
+  if (isEdition.value && state.frequency !== 'once') {
+    showConfirmModal.value = true
+  } else {
+    await executeSubmit(isEdition.value ? 'single' : undefined)
+  }
+}
+
+async function submitEdit(mode: 'all' | 'future') {
+  updateMode.value = mode
+  await executeSubmit(mode)
 }
 </script>
 
@@ -216,8 +288,53 @@ async function onSubmit(event: import('@nuxt/ui').FormSubmitEvent<Record<string,
         color="primary"
         :loading="loading"
       >
-        Ajouter
+        {{ isEdition ? 'Enregistrer' : 'Ajouter' }}
       </UButton>
     </div>
   </UForm>
+
+  <!-- Modale de confirmation pour transactions récurrentes -->
+  <UModal v-model:open="showConfirmModal">
+    <template #header>
+      <h3 class="font-semibold text-lg">
+        Appliquer les modifications
+      </h3>
+    </template>
+    <template #body>
+      <div class="flex flex-col gap-4">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Cette transaction est récurrente. Comment souhaitez-vous appliquer vos modifications ?
+        </p>
+        <div class="flex flex-col gap-2 mt-2">
+          <UButton
+            color="primary"
+            variant="solid"
+            class="justify-center"
+            :loading="isSubmitting && updateMode === 'future'"
+            @click="submitEdit('future')"
+          >
+            Uniquement les prochaines itérations
+          </UButton>
+          <UButton
+            color="neutral"
+            variant="outline"
+            class="justify-center"
+            :loading="isSubmitting && updateMode === 'all'"
+            @click="submitEdit('all')"
+          >
+            Toutes les itérations (passées et futures)
+          </UButton>
+        </div>
+        <div class="flex justify-end mt-4 border-t border-default pt-4">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            @click="showConfirmModal = false"
+          >
+            Annuler
+          </UButton>
+        </div>
+      </div>
+    </template>
+  </UModal>
 </template>

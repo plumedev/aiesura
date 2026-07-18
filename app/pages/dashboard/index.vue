@@ -64,6 +64,28 @@ const handleEditSuccess = async () => {
   await refreshAll()
 }
 
+const toast = useToast()
+
+const resetIteration = async (id: string) => {
+  try {
+    await $fetch(`/api/overview/iterations/${id}/reset`, {
+      method: 'POST'
+    })
+    toast.add({
+      title: 'Itération réinitialisée',
+      description: 'L\'itération a repris les valeurs de sa transaction parente.',
+      color: 'success'
+    })
+    await refreshAll()
+  } catch {
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de réinitialiser l\'itération.',
+      color: 'error'
+    })
+  }
+}
+
 // --- Scroll infini : sentinelle ---
 const sentinel = ref<HTMLElement | null>(null)
 
@@ -111,13 +133,25 @@ const kpiCards = computed(() => [
   }
 ])
 
-const getIterationDropdown = (iteration: TransactionIteration) => [[
-  {
-    label: 'Modifier',
-    icon: 'i-heroicons-pencil-square',
-    onSelect: () => openEditModal(iteration)
+const getIterationDropdown = (iteration: TransactionIteration) => {
+  const items = [
+    {
+      label: 'Modifier',
+      icon: 'i-heroicons-pencil-square',
+      onSelect: () => openEditModal(iteration)
+    }
+  ]
+
+  if (iteration.isModified) {
+    items.push({
+      label: 'Réinitialiser',
+      icon: 'i-heroicons-arrow-path',
+      onSelect: () => resetIteration(iteration.id)
+    })
   }
-]]
+
+  return [items]
+}
 
 const hasFilters = computed(() =>
   filters.search || filters.type || filters.accountIds.length > 0 || filters.amountRange

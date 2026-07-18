@@ -6,10 +6,11 @@ interface Transaction {
   name: string
   startDate: string
   endDate: string | null
-  frequency: string
-  type: string
+  frequency: 'once' | 'monthly' | 'quarterly' | 'yearly'
+  type: 'income' | 'expense'
   amount: string
-  account: { name: string }
+  accountId: string
+  account: { id: string, name: string }
 }
 
 const { data: transactions, refresh } = await useFetch<Transaction[]>('/api/transactions')
@@ -80,6 +81,29 @@ async function deleteTransaction(id: string) {
   }
 }
 
+const editingTransaction = ref<Transaction | null>(null)
+const isEditModalOpen = computed({
+  get: () => !!editingTransaction.value,
+  set: (val) => {
+    if (!val) {
+      editingTransaction.value = null
+    }
+  }
+})
+
+const openEditModal = (transaction: Transaction) => {
+  editingTransaction.value = transaction
+}
+
+const closeEditModal = () => {
+  editingTransaction.value = null
+}
+
+const handleEditSuccess = () => {
+  closeEditModal()
+  refresh()
+}
+
 function handleSuccess() {
   isModalOpen.value = false
   refresh()
@@ -101,7 +125,7 @@ const getDropdownItems = (row: unknown) => [
       label: 'Éditer',
       icon: 'i-heroicons-pencil-square',
       onSelect: () => {
-        toast.add({ title: 'Bientôt disponible', description: 'L\'édition de transaction sera implémentée prochainement.', color: 'info' })
+        openEditModal(getRow(row) as unknown as Transaction)
       }
     }
   ],
@@ -230,8 +254,26 @@ const getDropdownItems = (row: unknown) => [
       </template>
       <template #body>
         <TransactionsTransactionForm
+          v-if="isModalOpen"
           @close="closeModal"
           @success="handleSuccess"
+        />
+      </template>
+    </UModal>
+
+    <!-- Modale d'édition de transaction -->
+    <UModal v-model:open="isEditModalOpen">
+      <template #header>
+        <h3 class="font-semibold text-lg">
+          Modifier la transaction
+        </h3>
+      </template>
+      <template #body>
+        <TransactionsTransactionForm
+          v-if="isEditModalOpen && editingTransaction"
+          :transaction="editingTransaction"
+          @close="closeEditModal"
+          @success="handleEditSuccess"
         />
       </template>
     </UModal>

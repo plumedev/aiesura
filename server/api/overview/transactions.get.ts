@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
     .innerJoin(transactionIterations, eq(transactionIterations.transactionId, transactions.id))
     .innerJoin(accounts, eq(accounts.id, transactions.accountId))
     .where(and(...txConditions, ...iterationConditions))
-    .orderBy(asc(transactions.id))
+    .orderBy(asc(transactions.id), asc(transactionIterations.executionDate))
 
   // Grouper les itérations par transaction
   const txMap = new Map<string, {
