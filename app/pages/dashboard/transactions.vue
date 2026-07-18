@@ -157,134 +157,132 @@ const openModal = () => {
     </UDashboardNavbar>
 
     <div class="flex flex-col gap-4 p-4 h-full overflow-hidden">
+      <UCard>
+        <UInput
+          v-model="search"
+          icon="i-heroicons-magnifying-glass"
+          placeholder="Rechercher une transaction..."
+          class="w-72 max-w-full"
+        />
+      </UCard>
+
       <UCard
         class="flex-1 flex flex-col min-h-0"
         :ui="{ body: 'flex-1 overflow-hidden flex flex-col p-0 sm:p-0' }"
       >
-        <UDashboardToolbar>
-          <template #left>
-            <UInput
-              v-model="search"
-              icon="i-heroicons-magnifying-glass"
-              placeholder="Rechercher une transaction..."
-              class="w-72"
-            />
+        <UTable
+          v-model:sorting="sorting"
+          :data="filteredTransactions"
+          :columns="columns"
+          class="flex-1 overflow-auto"
+          sticky
+          :ui="{ thead: 'bg-gray-50/90 dark:bg-[#11463B]/90 backdrop-blur-md' }"
+        >
+          <!-- Headers -->
+          <template #name-header="{ column }">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
+              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
+              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
+            >
+              {{ column.columnDef.header }}
+            </UButton>
           </template>
-        </UDashboardToolbar>
-
-        <div class="flex-1 overflow-auto">
-          <UTable
-            v-model:sorting="sorting"
-            :data="filteredTransactions"
-            :columns="columns"
-            class="w-full"
-          >
-            <!-- Headers -->
-            <template #name-header="{ column }">
+          <template #startDate-header="{ column }">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
+              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
+              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
+            >
+              {{ column.columnDef.header }}
+            </UButton>
+          </template>
+          <template #frequency-header="{ column }">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
+              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
+              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
+            >
+              {{ column.columnDef.header }}
+            </UButton>
+          </template>
+          <template #type-header="{ column }">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
+              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
+              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
+            >
+              {{ column.columnDef.header }}
+            </UButton>
+          </template>
+          <template #account-header="{ column }">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
+              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
+              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
+            >
+              {{ column.columnDef.header }}
+            </UButton>
+          </template>
+          <template #amount-header="{ column }">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              class="-ml-2.5 font-semibold text-gray-900 dark:text-white"
+              :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
+              @click="column.toggleSorting(column.getIsSorted() === 'asc')"
+            >
+              {{ column.columnDef.header }}
+            </UButton>
+          </template>
+          <!-- Cells -->
+          <template #startDate-cell="{ row }">
+            {{ formatDate(getRow(row).startDate as string) }}
+            <span
+              v-if="getRow(row).endDate"
+              class="text-gray-500 text-xs ml-1"
+            >au {{ formatDate(getRow(row).endDate as string) }}</span>
+          </template>
+          <template #frequency-cell="{ row }">
+            {{ formatFrequency(getRow(row).frequency as string) }}
+          </template>
+          <template #type-cell="{ row }">
+            <UBadge
+              :color="getRow(row).type === 'income' ? 'success' : 'error'"
+              variant="subtle"
+            >
+              {{ getRow(row).type === 'income' ? 'Revenu' : 'Dépense' }}
+            </UBadge>
+          </template>
+          <template #account-cell="{ row }">
+            {{ (getRow(row).account as any)?.name }}
+          </template>
+          <template #amount-cell="{ row }">
+            <span :class="getRow(row).type === 'income' ? 'text-green-600' : 'text-red-400'">
+              {{ getRow(row).type === 'income' ? '+' : '-' }}{{ getRow(row).amount }} €
+            </span>
+          </template>
+          <template #actions-cell="{ row }">
+            <UDropdownMenu :items="getDropdownItems(row)">
               <UButton
-                variant="ghost"
                 color="neutral"
-                class="-ml-2.5"
-                :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-                @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-              >
-                {{ column.columnDef.header }}
-              </UButton>
-            </template>
-            <template #startDate-header="{ column }">
-              <UButton
                 variant="ghost"
-                color="neutral"
-                class="-ml-2.5"
-                :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-                @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-              >
-                {{ column.columnDef.header }}
-              </UButton>
-            </template>
-            <template #frequency-header="{ column }">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="-ml-2.5"
-                :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-                @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-              >
-                {{ column.columnDef.header }}
-              </UButton>
-            </template>
-            <template #type-header="{ column }">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="-ml-2.5"
-                :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-                @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-              >
-                {{ column.columnDef.header }}
-              </UButton>
-            </template>
-            <template #account-header="{ column }">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="-ml-2.5"
-                :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-                @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-              >
-                {{ column.columnDef.header }}
-              </UButton>
-            </template>
-            <template #amount-header="{ column }">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="-ml-2.5"
-                :icon="column.getIsSorted() ? (column.getIsSorted() === 'desc' ? 'i-heroicons-bars-arrow-down' : 'i-heroicons-bars-arrow-up') : 'i-heroicons-arrows-up-down'"
-                @click="column.toggleSorting(column.getIsSorted() === 'asc')"
-              >
-                {{ column.columnDef.header }}
-              </UButton>
-            </template>
-            <!-- Cells -->
-            <template #startDate-cell="{ row }">
-              {{ formatDate(getRow(row).startDate as string) }}
-              <span
-                v-if="getRow(row).endDate"
-                class="text-gray-500 text-xs ml-1"
-              >au {{ formatDate(getRow(row).endDate as string) }}</span>
-            </template>
-            <template #frequency-cell="{ row }">
-              {{ formatFrequency(getRow(row).frequency as string) }}
-            </template>
-            <template #type-cell="{ row }">
-              <UBadge
-                :color="getRow(row).type === 'income' ? 'success' : 'error'"
-                variant="subtle"
-              >
-                {{ getRow(row).type === 'income' ? 'Revenu' : 'Dépense' }}
-              </UBadge>
-            </template>
-            <template #account-cell="{ row }">
-              {{ (getRow(row).account as any)?.name }}
-            </template>
-            <template #amount-cell="{ row }">
-              <span :class="getRow(row).type === 'income' ? 'text-green-600' : 'text-red-400'">
-                {{ getRow(row).type === 'income' ? '+' : '-' }}{{ getRow(row).amount }} €
-              </span>
-            </template>
-            <template #actions-cell="{ row }">
-              <UDropdownMenu :items="getDropdownItems(row)">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-ellipsis-horizontal"
-                  size="xs"
-                />
-              </UDropdownMenu>
-            </template>
-          </UTable>
-        </div>
+                icon="i-heroicons-ellipsis-horizontal"
+                size="xs"
+              />
+            </UDropdownMenu>
+          </template>
+        </UTable>
       </UCard>
     </div>
 

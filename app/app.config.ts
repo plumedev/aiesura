@@ -40,6 +40,11 @@ export default defineAppConfig({
         itemLeadingIcon: 'text-inherit'
       }
     },
+    popover: {
+      slots: {
+        content: 'rounded-md glass-panel !ring-0 !border-none shadow-lg'
+      }
+    },
     table: {
       slots: {
         tr: '!border-none',
@@ -56,7 +61,8 @@ export default defineAppConfig({
     },
     selectMenu: {
       slots: {
-        base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none'
+        base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none',
+        content: 'rounded-md glass-panel !ring-0 !border-none shadow-lg'
       }
     },
     inputDate: {

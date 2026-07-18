@@ -39,3 +39,7 @@ Bien que les "slash commands" natives de l'interface soient limitées, je **dois
 
 ## Bonnes Pratiques Vue 3 / TypeScript
 *   **Événements (`@click`, etc.) :** Ne jamais utiliser d'assignation directe en ligne (ex: `@click="isOpen = false"`) car cela retourne un booléen et casse le typage strict (`void`) attendu par les composants (notamment Nuxt UI). Déclarer systématiquement une méthode dédiée dans le `<script setup>` (ex: `const closeModal = () => { isOpen.value = false }`).
+
+## Design & UI
+*   **Couleurs des conteneurs :** Le fond des conteneurs (cartes, tableaux, etc.) doit être `#F1F5F3` en mode light et `#0C3C32` en mode dark pour conserver la cohérence visuelle du projet.
+*   **Design System (`design.md`) :** Chaque fois qu'une nouvelle convention de design est introduite ou modifiée (ex: style de tableau, header sticky, couleur de bouton), je DOIS demander à l'utilisateur s'il faut mettre à jour le fichier `openspec/design.md` pour refléter ce changement.
