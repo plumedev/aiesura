@@ -1,3 +1,4 @@
+import { watchDebounced } from '@vueuse/core'
 import { startOfMonth, endOfMonth } from 'date-fns'
 import type {
   OverviewSummary,
@@ -95,13 +96,13 @@ export const useOverview = () => {
     await Promise.all([fetchSummary(), fetchTransactions()])
   }
 
-  // Watcher : recharger automatiquement quand la période ou les filtres changent
-  watch(
+  // Watcher : recharger automatiquement quand la période ou les filtres changent, avec un debounce de 400ms
+  watchDebounced(
     [dateRange, () => filters.search, () => filters.type, () => filters.accountIds, () => filters.amountRange],
     () => {
       refreshAll()
     },
-    { deep: true }
+    { debounce: 400, deep: true }
   )
 
   return {

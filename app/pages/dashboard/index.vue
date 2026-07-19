@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useIntersectionObserver } from '@vueuse/core'
+import { useIntersectionObserver, useLocalStorage } from '@vueuse/core'
+import { OwlDatePicker } from 'vue-owldate'
 import type { TransactionIteration } from '~/types/overview'
 
 definePageMeta({ layout: 'dashboard' })
@@ -17,6 +18,13 @@ const {
   refreshAll,
   formatAmount
 } = useOverview()
+
+// Choix du composant sélecteur de date (persiste dans le localStorage)
+const useOwlDatePicker = useLocalStorage('use-owl-date-picker', true)
+
+const toggleDatePicker = () => {
+  useOwlDatePicker.value = !useOwlDatePicker.value
+}
 
 // Comptes disponibles pour le filtre multiselect
 const { data: accounts } = await useFetch<Array<{ id: string, name: string }>>('/api/accounts')
@@ -171,19 +179,36 @@ const clearFilters = () => {
       <template #leading>
         <UDashboardSidebarCollapse />
       </template>
+      <template #right>
+        <UButton
+          :icon="useOwlDatePicker ? 'i-heroicons-calendar' : 'i-heroicons-adjustments-horizontal'"
+          :label="useOwlDatePicker ? 'Sélecteur standard' : 'Sélecteur Slider'"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          class="rounded-md"
+          @click="toggleDatePicker"
+        />
+      </template>
     </UDashboardNavbar>
 
     <div class="flex flex-col gap-6 p-4 h-full overflow-y-auto lg:overflow-hidden">
       <!-- ── Sélecteur de période ── -->
       <div class="flex items-center">
-        <p class="text-sm">
+        <p class="text-sm mr-2 text-gray-500 dark:text-gray-400">
           Période analysée
         </p>
-        <OverviewDateRangePicker
-          class="ml-2"
-          :model-value="dateRange"
-          @update:model-value="dateRange = $event"
-        />
+        <ClientOnly>
+          <OwlDatePicker
+            v-if="useOwlDatePicker"
+            v-model="dateRange"
+          />
+          <OverviewDateRangePicker
+            v-else
+            :model-value="dateRange"
+            @update:model-value="dateRange = $event"
+          />
+        </ClientOnly>
       </div>
 
       <!-- ── KPI Cards ── -->

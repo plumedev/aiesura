@@ -60,3 +60,32 @@ body {
 .dark .glass-panel {
   background-color: rgba(15, 80, 64, 0.3) !important;
 }
+
+/* ── Thème personnalisé pour vue-owldate (OwlDatePicker) ── */
+.vod {
+  --vod-primary: #0A332C !important;
+  --vod-bg: #F1F5F3 !important;
+  --vod-surface: #FFFFFF !important;
+  --vod-border: rgba(0, 0, 0, 0.1) !important;
+  --vod-text: #343434 !important;
+  --vod-text-muted: #6b7280 !important;
+  --vod-radius: 12px !important;
+  --vod-font: 'Outfit', sans-serif !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.dark .vod {
+  --vod-primary: #50E8A8 !important;
+  --vod-bg: #0C3C32 !important;
+  --vod-surface: #0A332C !important;
+  --vod-border: rgba(255, 255, 255, 0.1) !important;
+  --vod-text: #FFFFFF !important;
+  --vod-text-muted: #9ca3af !important;
+}
+
+/* Personnalisation de la bordure du bouton preset actif */
+.vod__preset-btn--active {
+  border-color: var(--vod-border) !important;
+}
