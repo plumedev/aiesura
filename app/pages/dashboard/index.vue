@@ -173,7 +173,7 @@ const clearFilters = () => {
       </template>
     </UDashboardNavbar>
 
-    <div class="flex flex-col gap-6 p-4 h-full overflow-auto">
+    <div class="flex flex-col gap-6 p-4 h-full overflow-y-auto lg:overflow-hidden">
       <!-- ── Sélecteur de période ── -->
       <div class="flex items-center justify-between">
         <p class="text-sm text-muted">
@@ -276,8 +276,11 @@ const clearFilters = () => {
 
       <!-- ── Tableau des transactions ── -->
       <UCard
-        class="flex-1 min-h-0"
-        :ui="{ body: 'p-0 sm:p-0' }"
+        class="flex-1 min-h-0 flex flex-col"
+        :ui="{
+          root: 'flex flex-col h-full',
+          body: 'p-0 sm:p-0 flex-1 min-h-0 overflow-y-auto'
+        }"
       >
         <div
           v-if="txPending && items.length === 0"

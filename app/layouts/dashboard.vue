@@ -10,7 +10,6 @@ const navItems = [
   { label: 'Comptes', icon: 'i-heroicons-building-library', to: '/dashboard/accounts' },
   { label: 'Transactions', icon: 'i-heroicons-banknotes', to: '/dashboard/transactions' },
   { label: 'Flux Mensuels', icon: 'i-heroicons-chart-bar', to: '/dashboard/flows' },
-  { label: 'Règles de virement', icon: 'i-heroicons-arrows-right-left', to: '/dashboard/rules' },
   { label: 'Paramètres', icon: 'i-heroicons-cog-8-tooth', to: '/dashboard/settings' }
 ].map(item => ({ ...item, onSelect: () => { open.value = false } })) satisfies NavigationMenuItem[]
 
