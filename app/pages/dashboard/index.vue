@@ -175,11 +175,12 @@ const clearFilters = () => {
 
     <div class="flex flex-col gap-6 p-4 h-full overflow-y-auto lg:overflow-hidden">
       <!-- ── Sélecteur de période ── -->
-      <div class="flex items-center justify-between">
-        <p class="text-sm text-muted">
+      <div class="flex items-center">
+        <p class="text-sm">
           Période analysée
         </p>
         <OverviewDateRangePicker
+          class="ml-2"
           :model-value="dateRange"
           @update:model-value="dateRange = $event"
         />
