@@ -7,6 +7,7 @@ export const profiles = pgTable('profiles', {
   id: uuid('id').primaryKey().notNull(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
+  onboarded: boolean('onboarded').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull()
 })
 

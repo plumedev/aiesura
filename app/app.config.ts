@@ -65,6 +65,11 @@ export default defineAppConfig({
         content: 'rounded-md glass-panel !ring-0 !border-none shadow-lg'
       }
     },
+    select: {
+      slots: {
+        base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none'
+      }
+    },
     inputDate: {
       slots: {
         base: '!bg-white/50 dark:!bg-black/20 !text-[var(--color-text-main)] !border !border-black/10 dark:!border-white/10 !ring-0 !outline-none !shadow-none'
