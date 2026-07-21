@@ -12,7 +12,12 @@ const register = async () => {
   successMsg.value = ''
   const { error } = await supabase.auth.signUp({
     email: email.value,
-    password: password.value
+    password: password.value,
+    options: {
+      data: {
+        name: email.value.split('@')[0]
+      }
+    }
   })
   if (error) {
     errorMsg.value = error.message
