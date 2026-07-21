@@ -128,41 +128,19 @@ const getRecurringRuleDetailsLabel = (rule: TransferRule): string => {
     </div>
 
     <!-- Modale de confirmation de suppression -->
-    <UModal v-model:open="isDeleteOpen">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="text-lg font-semibold text-red-400 flex items-center gap-2">
-              <UIcon
-                name="i-heroicons-exclamation-triangle"
-                class="w-5 h-5"
-              />
-              Confirmer la suppression
-            </h3>
-          </template>
-          <div class="space-y-4">
-            <p class="text-gray-600 dark:text-gray-300 text-sm">
-              Êtes-vous sûr de vouloir supprimer la règle <strong class="text-gray-900 dark:text-white">« {{ ruleToDelete?.purposeName }} »</strong> ? Cette action est irréversible.
-            </p>
-            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
-              <UButton
-                label="Annuler"
-                color="neutral"
-                variant="ghost"
-                class="w-full justify-center sm:w-auto cursor-pointer"
-                @click="closeDeleteModal"
-              />
-              <UButton
-                label="Oui, supprimer"
-                color="error"
-                :loading="loadingId === ruleToDelete?.id"
-                class="w-full justify-center sm:w-auto cursor-pointer"
-                @click="confirmDeleteRule"
-              />
-            </div>
-          </div>
-        </UCard>
-      </template>
-    </UModal>
+    <AppModal
+      v-model:open="isDeleteOpen"
+      title="Confirmer la suppression"
+      icon="i-heroicons-exclamation-triangle"
+      confirm-label="Oui, supprimer"
+      confirm-color="error"
+      :loading="loadingId === ruleToDelete?.id"
+      @confirm="confirmDeleteRule"
+      @cancel="closeDeleteModal"
+    >
+      <p class="text-gray-600 dark:text-gray-300 text-sm">
+        Êtes-vous sûr de vouloir supprimer la règle <strong class="text-gray-900 dark:text-white">« {{ ruleToDelete?.purposeName }} »</strong> ? Cette action est irréversible.
+      </p>
+    </AppModal>
   </div>
 </template>

@@ -266,74 +266,44 @@ const getDropdownItems = (row: unknown) => [
       </UCard>
     </div>
 
-    <UModal v-model:open="isModalOpen">
-      <template #header>
-        <h3 class="font-semibold text-lg">
-          Nouvelle transaction
-        </h3>
-      </template>
-      <template #body>
-        <TransactionsTransactionForm
-          v-if="isModalOpen"
-          @close="closeModal"
-          @success="handleSuccess"
-        />
-      </template>
-    </UModal>
+    <AppModal
+      v-model:open="isModalOpen"
+      title="Nouvelle transaction"
+    >
+      <TransactionsTransactionForm
+        v-if="isModalOpen"
+        @close="closeModal"
+        @success="handleSuccess"
+      />
+    </AppModal>
 
     <!-- Modale d'édition de transaction -->
-    <UModal v-model:open="isEditModalOpen">
-      <template #header>
-        <h3 class="font-semibold text-lg">
-          Modifier la transaction
-        </h3>
-      </template>
-      <template #body>
-        <TransactionsTransactionForm
-          v-if="isEditModalOpen && editingTransaction"
-          :transaction="editingTransaction"
-          @close="closeEditModal"
-          @success="handleEditSuccess"
-        />
-      </template>
-    </UModal>
+    <AppModal
+      v-model:open="isEditModalOpen"
+      title="Modifier la transaction"
+    >
+      <TransactionsTransactionForm
+        v-if="isEditModalOpen && editingTransaction"
+        :transaction="editingTransaction"
+        @close="closeEditModal"
+        @success="handleEditSuccess"
+      />
+    </AppModal>
 
     <!-- Modale de confirmation de suppression de transaction -->
-    <UModal v-model:open="isDeleteModalOpen">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="text-lg font-semibold text-red-500 flex items-center gap-2">
-              <UIcon
-                name="i-heroicons-exclamation-triangle"
-                class="w-5 h-5"
-              />
-              Confirmer la suppression
-            </h3>
-          </template>
-          <div class="space-y-4">
-            <p class="text-gray-600 dark:text-gray-300 text-sm">
-              Êtes-vous sûr de vouloir supprimer la transaction <strong class="text-gray-900 dark:text-white">« {{ transactionToDelete?.name }} »</strong> ?
-            </p>
-            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
-              <UButton
-                label="Annuler"
-                color="neutral"
-                variant="ghost"
-                class="w-full justify-center sm:w-auto cursor-pointer"
-                @click="closeDeleteModal"
-              />
-              <UButton
-                label="Oui, supprimer"
-                color="error"
-                :loading="deleteLoading"
-                class="w-full justify-center sm:w-auto cursor-pointer"
-                @click="confirmDeleteTransaction"
-              />
-            </div>
-          </div>
-        </UCard>
-      </template>
-    </UModal>
+    <AppModal
+      v-model:open="isDeleteModalOpen"
+      title="Confirmer la suppression"
+      icon="i-heroicons-exclamation-triangle"
+      confirm-label="Oui, supprimer"
+      confirm-color="error"
+      :loading="deleteLoading"
+      @confirm="confirmDeleteTransaction"
+      @cancel="closeDeleteModal"
+    >
+      <p class="text-gray-600 dark:text-gray-300 text-sm">
+        Êtes-vous sûr de vouloir supprimer la transaction <strong class="text-gray-900 dark:text-white">« {{ transactionToDelete?.name }} »</strong> ?
+      </p>
+    </AppModal>
   </UDashboardPanel>
 </template>
