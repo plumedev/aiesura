@@ -12,13 +12,27 @@ const emit = defineEmits<{
 
 const toast = useToast()
 const loadingId = ref<string | null>(null)
+const ruleToDelete = ref<TransferRule | null>(null)
+const isDeleteOpen = ref(false)
 
-const deleteRule = async (id: string) => {
-  if (!confirm('Supprimer cette règle ?')) return
+const openDeleteModal = (rule: TransferRule) => {
+  ruleToDelete.value = rule
+  isDeleteOpen.value = true
+}
+
+const closeDeleteModal = () => {
+  isDeleteOpen.value = false
+  ruleToDelete.value = null
+}
+
+const confirmDeleteRule = async () => {
+  if (!ruleToDelete.value) return
+  const id = ruleToDelete.value.id
   loadingId.value = id
   try {
     await $fetch(`/api/transfer-rules/${id}`, { method: 'DELETE' })
     toast.add({ title: 'Règle supprimée', color: 'success' })
+    closeDeleteModal()
     emit('deleted')
   } catch {
     toast.add({ title: 'Erreur lors de la suppression', color: 'error' })
@@ -78,7 +92,7 @@ const getRecurringRuleDetailsLabel = (rule: TransferRule): string => {
               color="error"
               size="xs"
               :loading="loadingId === rule.id"
-              @click="deleteRule(rule.id)"
+              @click="openDeleteModal(rule)"
             />
           </div>
         </div>
@@ -112,5 +126,43 @@ const getRecurringRuleDetailsLabel = (rule: TransferRule): string => {
         </div>
       </div>
     </div>
+
+    <!-- Modale de confirmation de suppression -->
+    <UModal v-model:open="isDeleteOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-lg font-semibold text-red-400 flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="w-5 h-5"
+              />
+              Confirmer la suppression
+            </h3>
+          </template>
+          <div class="space-y-4">
+            <p class="text-gray-600 dark:text-gray-300 text-sm">
+              Êtes-vous sûr de vouloir supprimer la règle <strong class="text-gray-900 dark:text-white">« {{ ruleToDelete?.purposeName }} »</strong> ? Cette action est irréversible.
+            </p>
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
+              <UButton
+                label="Annuler"
+                color="neutral"
+                variant="ghost"
+                class="w-full justify-center sm:w-auto cursor-pointer"
+                @click="closeDeleteModal"
+              />
+              <UButton
+                label="Oui, supprimer"
+                color="error"
+                :loading="loadingId === ruleToDelete?.id"
+                class="w-full justify-center sm:w-auto cursor-pointer"
+                @click="confirmDeleteRule"
+              />
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>

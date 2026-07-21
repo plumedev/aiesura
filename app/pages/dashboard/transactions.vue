@@ -66,11 +66,27 @@ const balance = computed(() => {
 })
 
 const toast = useToast()
+const deleteLoading = ref(false)
+const transactionToDelete = ref<Transaction | null>(null)
+const isDeleteModalOpen = ref(false)
 
-async function deleteTransaction(id: string) {
+const openDeleteModal = (transaction: Transaction) => {
+  transactionToDelete.value = transaction
+  isDeleteModalOpen.value = true
+}
+
+const closeDeleteModal = () => {
+  isDeleteModalOpen.value = false
+  transactionToDelete.value = null
+}
+
+async function confirmDeleteTransaction() {
+  if (!transactionToDelete.value) return
+  deleteLoading.value = true
   try {
-    await $fetch(`/api/transactions/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/transactions/${transactionToDelete.value.id}`, { method: 'DELETE' })
     toast.add({ title: 'Transaction supprimée', color: 'success' })
+    closeDeleteModal()
     refresh()
   } catch {
     toast.add({
@@ -78,6 +94,8 @@ async function deleteTransaction(id: string) {
       description: 'Impossible de supprimer la transaction',
       color: 'error'
     })
+  } finally {
+    deleteLoading.value = false
   }
 }
 
@@ -134,7 +152,9 @@ const getDropdownItems = (row: unknown) => [
       label: 'Supprimer',
       icon: 'i-heroicons-trash',
       color: 'error' as const,
-      onSelect: () => deleteTransaction(getRow(row).id as string)
+      onSelect: () => {
+        openDeleteModal(getRow(row) as unknown as Transaction)
+      }
     }
   ]
 ]
@@ -275,6 +295,44 @@ const getDropdownItems = (row: unknown) => [
           @close="closeEditModal"
           @success="handleEditSuccess"
         />
+      </template>
+    </UModal>
+
+    <!-- Modale de confirmation de suppression de transaction -->
+    <UModal v-model:open="isDeleteModalOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-lg font-semibold text-red-500 flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="w-5 h-5"
+              />
+              Confirmer la suppression
+            </h3>
+          </template>
+          <div class="space-y-4">
+            <p class="text-gray-600 dark:text-gray-300 text-sm">
+              Êtes-vous sûr de vouloir supprimer la transaction <strong class="text-gray-900 dark:text-white">« {{ transactionToDelete?.name }} »</strong> ?
+            </p>
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
+              <UButton
+                label="Annuler"
+                color="neutral"
+                variant="ghost"
+                class="w-full justify-center sm:w-auto cursor-pointer"
+                @click="closeDeleteModal"
+              />
+              <UButton
+                label="Oui, supprimer"
+                color="error"
+                :loading="deleteLoading"
+                class="w-full justify-center sm:w-auto cursor-pointer"
+                @click="confirmDeleteTransaction"
+              />
+            </div>
+          </div>
+        </UCard>
       </template>
     </UModal>
   </UDashboardPanel>
