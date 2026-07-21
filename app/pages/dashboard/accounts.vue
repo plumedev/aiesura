@@ -213,83 +213,39 @@ const items = (row: { id: string, name: string, isMain: boolean }) => [
       </UCard>
 
       <!-- Modal Édition -->
-      <UModal v-model:open="isEditOpen">
-        <template #content>
-          <UCard>
-            <template #header>
-              <h3 class="text-lg font-semibold">
-                Modifier le compte
-              </h3>
-            </template>
-            <form
-              class="space-y-4"
-              @submit.prevent="updateAccount"
-            >
-              <UFormField label="Nom du compte">
-                <UInput
-                  v-model="formState.name"
-                  required
-                  autofocus
-                />
-              </UFormField>
-              <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
-                <UButton
-                  label="Annuler"
-                  color="neutral"
-                  variant="ghost"
-                  class="w-full justify-center sm:w-auto"
-                  @click="closeEditModal"
-                />
-                <UButton
-                  type="submit"
-                  label="Sauvegarder"
-                  color="primary"
-                  :loading="loading"
-                  class="w-full justify-center sm:w-auto"
-                />
-              </div>
-            </form>
-          </UCard>
-        </template>
-      </UModal>
+      <AppModal
+        v-model:open="isEditOpen"
+        title="Modifier le compte"
+        confirm-label="Sauvegarder"
+        confirm-color="primary"
+        :loading="loading"
+        @confirm="updateAccount"
+        @cancel="closeEditModal"
+      >
+        <UFormField label="Nom du compte">
+          <UInput
+            v-model="formState.name"
+            required
+            autofocus
+          />
+        </UFormField>
+      </AppModal>
 
       <!-- Modal Suppression -->
-      <UModal v-model:open="isDeleteOpen">
-        <template #content>
-          <UCard>
-            <template #header>
-              <h3 class="text-lg font-semibold text-red-500 flex items-center gap-2">
-                <UIcon
-                  name="i-heroicons-exclamation-triangle"
-                  class="w-5 h-5"
-                />
-                Confirmer la suppression
-              </h3>
-            </template>
-            <div class="space-y-4">
-              <p class="text-gray-600 dark:text-gray-300">
-                Êtes-vous sûr de vouloir supprimer ce compte ? Toutes les dépenses, flux et règles de transferts qui y sont liés seront définitivement supprimés de la base de données.
-              </p>
-              <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-0 sm:space-x-3 pt-4">
-                <UButton
-                  label="Annuler"
-                  color="neutral"
-                  variant="ghost"
-                  class="w-full justify-center sm:w-auto"
-                  @click="closeDeleteModal"
-                />
-                <UButton
-                  label="Oui, supprimer"
-                  color="error"
-                  :loading="loading"
-                  class="w-full justify-center sm:w-auto"
-                  @click="deleteAccount"
-                />
-              </div>
-            </div>
-          </UCard>
-        </template>
-      </UModal>
+      <AppModal
+        v-model:open="isDeleteOpen"
+        title="Confirmer la suppression"
+        icon="i-heroicons-exclamation-triangle"
+        confirm-label="Oui, supprimer"
+        confirm-color="error"
+        :loading="loading"
+        @confirm="deleteAccount"
+        @cancel="closeDeleteModal"
+      >
+        <p class="text-gray-600 dark:text-gray-300 text-sm">
+          Êtes-vous sûr de vouloir supprimer ce compte ? Toutes les dépenses, flux et règles de transferts qui y sont liés seront définitivement supprimés de la base de données.
+        </p>
+      </AppModal>
     </div>
   </UDashboardPanel>
 </template>

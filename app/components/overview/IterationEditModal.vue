@@ -66,81 +66,74 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <UModal
+  <AppModal
     :open="true"
+    title="Modifier l'itération"
     @update:open="closeModal"
   >
-    <template #header>
-      <h3 class="font-semibold text-lg">
-        Modifier l'itération
-      </h3>
-    </template>
+    <form
+      class="flex flex-col gap-4"
+      @submit.prevent="handleSubmit"
+    >
+      <!-- Libellé -->
+      <UFormField label="Libellé">
+        <UInput
+          v-model="form.name"
+          placeholder="Nom de l'itération"
+          class="w-full"
+        />
+      </UFormField>
 
-    <template #body>
-      <form
-        class="flex flex-col gap-4"
-        @submit.prevent="handleSubmit"
-      >
-        <!-- Libellé -->
-        <UFormField label="Libellé">
-          <UInput
-            v-model="form.name"
-            placeholder="Nom de l'itération"
-            class="w-full"
-          />
-        </UFormField>
+      <!-- Montant -->
+      <UFormField label="Montant (€)">
+        <UInput
+          v-model.number="form.amount"
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="0.00"
+          class="w-full"
+        />
+      </UFormField>
 
-        <!-- Montant -->
-        <UFormField label="Montant (€)">
-          <UInput
-            v-model.number="form.amount"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            class="w-full"
-          />
-        </UFormField>
+      <!-- Type -->
+      <UFormField label="Type">
+        <USelectMenu
+          v-model="form.type"
+          :items="typeOptions"
+          value-key="value"
+          label-key="label"
+          class="w-full"
+        />
+      </UFormField>
 
-        <!-- Type -->
-        <UFormField label="Type">
-          <USelectMenu
-            v-model="form.type"
-            :items="typeOptions"
-            value-key="value"
-            label-key="label"
-            class="w-full"
-          />
-        </UFormField>
+      <!-- Date d'exécution -->
+      <UFormField label="Date d'exécution">
+        <UInput
+          v-model="form.executionDate"
+          type="date"
+          class="w-full"
+        />
+      </UFormField>
 
-        <!-- Date d'exécution -->
-        <UFormField label="Date d'exécution">
-          <UInput
-            v-model="form.executionDate"
-            type="date"
-            class="w-full"
-          />
-        </UFormField>
-
-        <!-- Actions -->
-        <div class="flex justify-end gap-2 pt-2">
-          <UButton
-            variant="ghost"
-            color="neutral"
-            type="button"
-            @click="closeModal"
-          >
-            Annuler
-          </UButton>
-          <UButton
-            type="submit"
-            color="primary"
-            :loading="isSubmitting"
-          >
-            Enregistrer
-          </UButton>
-        </div>
-      </form>
-    </template>
-  </UModal>
+      <!-- Actions -->
+      <div class="flex justify-end gap-2 pt-2">
+        <UButton
+          variant="ghost"
+          color="neutral"
+          type="button"
+          @click="closeModal"
+        >
+          Annuler
+        </UButton>
+        <UButton
+          type="submit"
+          color="primary"
+          :loading="isSubmitting"
+        >
+          Enregistrer
+        </UButton>
+      </div>
+    </form>
+  </AppModal>
 </template>

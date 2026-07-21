@@ -294,47 +294,43 @@ async function submitEdit(mode: 'all' | 'future') {
   </UForm>
 
   <!-- Modale de confirmation pour transactions récurrentes -->
-  <UModal v-model:open="showConfirmModal">
-    <template #header>
-      <h3 class="font-semibold text-lg">
-        Appliquer les modifications
-      </h3>
-    </template>
-    <template #body>
-      <div class="flex flex-col gap-4">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          Cette transaction est récurrente. Comment souhaitez-vous appliquer vos modifications ?
-        </p>
-        <div class="flex flex-col gap-2 mt-2">
-          <UButton
-            color="primary"
-            variant="solid"
-            class="justify-center"
-            :loading="isSubmitting && updateMode === 'future'"
-            @click="submitEdit('future')"
-          >
-            Uniquement les prochaines itérations
-          </UButton>
-          <UButton
-            color="neutral"
-            variant="outline"
-            class="justify-center"
-            :loading="isSubmitting && updateMode === 'all'"
-            @click="submitEdit('all')"
-          >
-            Toutes les itérations (passées et futures)
-          </UButton>
-        </div>
-        <div class="flex justify-end mt-4 border-t border-default pt-4">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            @click="showConfirmModal = false"
-          >
-            Annuler
-          </UButton>
-        </div>
+  <AppModal
+    v-model:open="showConfirmModal"
+    title="Appliquer les modifications"
+  >
+    <div class="flex flex-col gap-4">
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Cette transaction est récurrente. Comment souhaitez-vous appliquer vos modifications ?
+      </p>
+      <div class="flex flex-col gap-2 mt-2">
+        <UButton
+          color="primary"
+          variant="solid"
+          class="justify-center"
+          :loading="isSubmitting && updateMode === 'future'"
+          @click="submitEdit('future')"
+        >
+          Uniquement les prochaines itérations
+        </UButton>
+        <UButton
+          color="neutral"
+          variant="outline"
+          class="justify-center"
+          :loading="isSubmitting && updateMode === 'all'"
+          @click="submitEdit('all')"
+        >
+          Toutes les itérations (passées et futures)
+        </UButton>
       </div>
-    </template>
-  </UModal>
+      <div class="flex justify-end mt-4 border-t border-default pt-4">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          @click="showConfirmModal = false"
+        >
+          Annuler
+        </UButton>
+      </div>
+    </div>
+  </AppModal>
 </template>

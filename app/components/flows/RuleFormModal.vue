@@ -161,148 +161,145 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <UModal
+  <AppModal
     :open="open"
     :title="isEdit ? 'Modifier la règle de virement' : 'Créer une règle de virement'"
-    :ui="{ content: 'max-w-lg' }"
     @update:open="handleClose"
   >
-    <template #body>
-      <div class="space-y-4">
-        <!-- Nom -->
+    <div class="space-y-4">
+      <!-- Nom -->
+      <UFormField
+        label="Nom de la règle"
+        required
+      >
+        <UInput
+          v-model="form.purposeName"
+          placeholder="Ex : Épargne mensuelle, Loyer, Courses..."
+          class="w-full"
+        />
+      </UFormField>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Compte source -->
         <UFormField
-          label="Nom de la règle"
+          label="Compte source"
           required
         >
-          <UInput
-            v-model="form.purposeName"
-            placeholder="Ex : Épargne mensuelle, Loyer, Courses..."
+          <USelect
+            v-model="form.sourceAccountId"
+            :items="accountOptions"
+            placeholder="Source"
             class="w-full"
           />
         </UFormField>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Compte source -->
-          <UFormField
-            label="Compte source"
-            required
-          >
-            <USelect
-              v-model="form.sourceAccountId"
-              :items="accountOptions"
-              placeholder="Source"
-              class="w-full"
-            />
-          </UFormField>
+        <!-- Transit (optionnel) -->
+        <UFormField label="Transit (Optionnel)">
+          <USelect
+            v-model="form.transitAccountId"
+            :items="transitAccountOptions"
+            class="w-full"
+          />
+        </UFormField>
 
-          <!-- Transit (optionnel) -->
-          <UFormField label="Transit (Optionnel)">
-            <USelect
-              v-model="form.transitAccountId"
-              :items="transitAccountOptions"
-              class="w-full"
-            />
-          </UFormField>
-
-          <!-- Destination -->
-          <UFormField
-            label="Destination"
-            required
-          >
-            <USelect
-              v-model="form.destinationAccountId"
-              :items="accountOptions"
-              placeholder="Destination"
-              class="w-full"
-            />
-          </UFormField>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Type de montant -->
-          <UFormField
-            label="Type de montant"
-            required
-          >
-            <USelect
-              v-model="form.amountType"
-              :items="amountTypeOptions"
-              class="w-full"
-            />
-          </UFormField>
-
-          <!-- Montant fixe -->
-          <UFormField
-            v-if="form.amountType === 'fixed'"
-            label="Montant (€)"
-            required
-          >
-            <UInput
-              v-model.number="form.amount"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="500"
-              class="w-full"
-            />
-          </UFormField>
-        </div>
-
-        <!-- Itérations récurrentes -->
-        <div
-          v-if="form.amountType === 'recurring'"
-          class="space-y-3 border border-default p-4 rounded-lg bg-surface/50 max-h-60 overflow-y-auto"
+        <!-- Destination -->
+        <UFormField
+          label="Destination"
+          required
         >
-          <div class="text-xs font-bold text-gray-500 dark:text-gray-400 font-mono uppercase tracking-wider mb-2">
-            Associer des transactions récurrentes
-          </div>
+          <USelect
+            v-model="form.destinationAccountId"
+            :items="accountOptions"
+            placeholder="Destination"
+            class="w-full"
+          />
+        </UFormField>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Type de montant -->
+        <UFormField
+          label="Type de montant"
+          required
+        >
+          <USelect
+            v-model="form.amountType"
+            :items="amountTypeOptions"
+            class="w-full"
+          />
+        </UFormField>
+
+        <!-- Montant fixe -->
+        <UFormField
+          v-if="form.amountType === 'fixed'"
+          label="Montant (€)"
+          required
+        >
+          <UInput
+            v-model.number="form.amount"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="500"
+            class="w-full"
+          />
+        </UFormField>
+      </div>
+
+      <!-- Itérations récurrentes -->
+      <div
+        v-if="form.amountType === 'recurring'"
+        class="space-y-3 border border-default p-4 rounded-lg bg-surface/50 max-h-60 overflow-y-auto"
+      >
+        <div class="text-xs font-bold text-gray-500 dark:text-gray-400 font-mono uppercase tracking-wider mb-2">
+          Associer des transactions récurrentes
+        </div>
+        <div
+          v-if="iterations.length === 0"
+          class="text-xs text-gray-500 dark:text-gray-400 py-2 font-mono"
+        >
+          Aucune transaction ce mois-ci.
+        </div>
+        <div
+          v-else
+          class="space-y-2"
+        >
           <div
-            v-if="iterations.length === 0"
-            class="text-xs text-gray-500 dark:text-gray-400 py-2 font-mono"
+            v-for="tx in iterations"
+            :key="tx.id"
+            class="flex items-center justify-between gap-4 p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition"
           >
-            Aucune transaction ce mois-ci.
-          </div>
-          <div
-            v-else
-            class="space-y-2"
-          >
+            <div class="flex items-center gap-2 flex-1">
+              <UCheckbox
+                :model-value="isTxSelected(tx.id)"
+                @update:model-value="(val) => toggleTxSelection(tx.id, !!val)"
+              />
+              <div class="flex flex-col">
+                <span class="text-xs font-bold text-gray-900 dark:text-white">{{ tx.name }}</span>
+                <span class="text-[10px] text-gray-500 dark:text-gray-400 font-mono">
+                  {{ formatAmount(Number(tx.amount)) }} ({{ tx.transaction.account.name }})
+                </span>
+              </div>
+            </div>
             <div
-              v-for="tx in iterations"
-              :key="tx.id"
-              class="flex items-center justify-between gap-4 p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition"
+              v-if="isTxSelected(tx.id)"
+              class="flex items-center gap-1 w-20"
             >
-              <div class="flex items-center gap-2 flex-1">
-                <UCheckbox
-                  :model-value="isTxSelected(tx.id)"
-                  @update:model-value="(val) => toggleTxSelection(tx.id, !!val)"
-                />
-                <div class="flex flex-col">
-                  <span class="text-xs font-bold text-gray-900 dark:text-white">{{ tx.name }}</span>
-                  <span class="text-[10px] text-gray-500 dark:text-gray-400 font-mono">
-                    {{ formatAmount(Number(tx.amount)) }} ({{ tx.transaction.account.name }})
-                  </span>
-                </div>
-              </div>
-              <div
-                v-if="isTxSelected(tx.id)"
-                class="flex items-center gap-1 w-20"
-              >
-                <UInput
-                  :model-value="getTxPercentage(tx.id)"
-                  type="number"
-                  min="1"
-                  max="100"
-                  class="font-mono text-xs w-14"
-                  placeholder="100"
-                  @update:model-value="(val) => updateTxPercentage(tx.id, Number(val))"
-                />
-                <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">%</span>
-              </div>
+              <UInput
+                :model-value="getTxPercentage(tx.id)"
+                type="number"
+                min="1"
+                max="100"
+                class="font-mono text-xs w-14"
+                placeholder="100"
+                @update:model-value="(val) => updateTxPercentage(tx.id, Number(val))"
+              />
+              <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">%</span>
             </div>
           </div>
         </div>
       </div>
-    </template>
+    </div>
 
     <template #footer>
       <div class="flex justify-end gap-2">
@@ -322,5 +319,5 @@ const handleSubmit = async () => {
         </UButton>
       </div>
     </template>
-  </UModal>
+  </AppModal>
 </template>
