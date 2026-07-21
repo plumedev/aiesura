@@ -20,8 +20,6 @@ interface Transaction {
   account?: Account
 }
 
-
-
 interface Profile {
   id: string
   name: string
@@ -412,10 +410,10 @@ onMounted(async () => {
     </div>
 
     <!-- Colonne droite : Formulaires interactifs (Non-scrollable globalement, listes scrollables) -->
-    <div class="flex-1 p-6 md:p-12 lg:p-16 flex flex-col justify-between max-w-4xl mx-auto w-full h-full overflow-hidden">
-      <div class="space-y-8 flex-grow flex flex-col justify-start overflow-hidden">
+    <div class="flex-1 p-6 md:p-8 lg:p-10 flex flex-col justify-between max-w-4xl mx-auto w-full h-full overflow-hidden">
+      <div class="space-y-4 flex-grow flex flex-col justify-start overflow-hidden">
         <!-- HEADER DE L'ÉTAPE COURANTE -->
-        <div class="space-y-2 flex-shrink-0">
+        <div class="space-y-1.5 flex-shrink-0">
           <UBadge
             color="success"
             variant="soft"
@@ -450,11 +448,11 @@ onMounted(async () => {
         </div>
 
         <!-- ZONE D'INTERACTION ACTIVE -->
-        <div class="space-y-6 flex-grow flex flex-col overflow-hidden">
+        <div class="space-y-4 flex-grow flex flex-col overflow-hidden">
           <!-- ÉTAPE 1 : COMPTES -->
           <div
             v-if="currentStep === 1"
-            class="space-y-6 flex-grow flex flex-col overflow-hidden"
+            class="space-y-4 flex-grow flex flex-col overflow-hidden"
           >
             <UCard class="bg-[#F1F5F3] dark:bg-[#0C3C32] border-0 flex-shrink-0">
               <form
@@ -504,7 +502,7 @@ onMounted(async () => {
             </UCard>
 
             <!-- Liste des comptes existants (Scrollable) -->
-            <div class="space-y-3 flex-grow flex flex-col overflow-hidden">
+            <div class="space-y-2 flex-grow flex flex-col overflow-hidden">
               <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 flex-shrink-0">
                 Vos comptes bancaires créés ({{ accounts.length }})
               </h3>
@@ -516,19 +514,19 @@ onMounted(async () => {
               </div>
               <div
                 v-else
-                class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto max-h-[220px] pr-2 flex-grow"
+                class="space-y-1.5 overflow-y-auto max-h-[460px] pr-2 flex-grow"
               >
                 <div
                   v-for="acc in accounts"
                   :key="acc.id"
-                  class="p-4 bg-[#F1F5F3] dark:bg-[#0C3C32] rounded-lg flex items-center justify-between border border-emerald-950/10 dark:border-white/5"
+                  class="py-2 px-3.5 bg-[#F1F5F3] dark:bg-[#0C3C32] rounded-lg flex items-center justify-between border border-emerald-950/10 dark:border-white/5"
                 >
                   <div class="flex items-center gap-3">
                     <UIcon
                       :name="acc.icon || 'i-heroicons-building-library'"
                       class="w-6 h-6 flex-shrink-0 text-[#0A332C] dark:text-[#50E8A8]"
                     />
-                    <div>
+                    <div class="flex items-center gap-2">
                       <p class="font-bold text-gray-800 dark:text-white text-sm">
                         {{ acc.name }}
                       </p>
@@ -537,7 +535,6 @@ onMounted(async () => {
                         color="warning"
                         variant="subtle"
                         size="xs"
-                        class="mt-0.5"
                       >
                         Principal
                       </UBadge>
@@ -559,7 +556,7 @@ onMounted(async () => {
           <!-- ÉTAPE 2 : REVENUS -->
           <div
             v-else-if="currentStep === 2"
-            class="space-y-6 flex-grow flex flex-col overflow-hidden"
+            class="space-y-4 flex-grow flex flex-col overflow-hidden"
           >
             <div
               v-if="accounts.length === 0"
@@ -571,7 +568,7 @@ onMounted(async () => {
             <template v-else>
               <UCard class="bg-[#F1F5F3] dark:bg-[#0C3C32] border-0 flex-shrink-0">
                 <form
-                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end"
+                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-end"
                   @submit.prevent="handleCreateIncome"
                 >
                   <UFormField
@@ -652,7 +649,7 @@ onMounted(async () => {
               </UCard>
 
               <!-- Liste des revenus (Scrollable) -->
-              <div class="space-y-3 flex-grow flex flex-col overflow-hidden">
+              <div class="space-y-2 flex-grow flex flex-col overflow-hidden">
                 <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 flex-shrink-0">
                   Vos revenus enregistrés ({{ incomes.length }})
                 </h3>
@@ -664,12 +661,12 @@ onMounted(async () => {
                 </div>
                 <div
                   v-else
-                  class="space-y-2 overflow-y-auto max-h-[220px] pr-2 flex-grow"
+                  class="space-y-1.5 overflow-y-auto max-h-[460px] pr-2 flex-grow"
                 >
                   <div
                     v-for="inc in incomes"
                     :key="inc.id"
-                    class="p-4 bg-[#F1F5F3] dark:bg-[#0C3C32] rounded-lg flex items-center justify-between border border-emerald-950/10 dark:border-white/5"
+                    class="py-2 px-3.5 bg-[#F1F5F3] dark:bg-[#0C3C32] rounded-lg flex items-center justify-between border border-emerald-950/10 dark:border-white/5"
                   >
                     <div class="flex items-center gap-3">
                       <UIcon
@@ -705,7 +702,7 @@ onMounted(async () => {
           <!-- ÉTAPE 3 : DÉPENSES -->
           <div
             v-else-if="currentStep === 3"
-            class="space-y-6 flex-grow flex flex-col overflow-hidden"
+            class="space-y-4 flex-grow flex flex-col overflow-hidden"
           >
             <div
               v-if="accounts.length === 0"
@@ -717,7 +714,7 @@ onMounted(async () => {
             <template v-else>
               <UCard class="bg-[#F1F5F3] dark:bg-[#0C3C32] border-0 flex-shrink-0">
                 <form
-                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end"
+                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-end"
                   @submit.prevent="handleCreateExpense"
                 >
                   <UFormField
@@ -798,7 +795,7 @@ onMounted(async () => {
               </UCard>
 
               <!-- Liste des dépenses (Scrollable) -->
-              <div class="space-y-3 flex-grow flex flex-col overflow-hidden">
+              <div class="space-y-2 flex-grow flex flex-col overflow-hidden">
                 <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 flex-shrink-0">
                   Vos dépenses enregistrées ({{ expenses.length }})
                 </h3>
@@ -810,12 +807,12 @@ onMounted(async () => {
                 </div>
                 <div
                   v-else
-                  class="space-y-2 overflow-y-auto max-h-[220px] pr-2 flex-grow"
+                  class="space-y-1.5 overflow-y-auto max-h-[460px] pr-2 flex-grow"
                 >
                   <div
                     v-for="exp in expenses"
                     :key="exp.id"
-                    class="p-4 bg-[#F1F5F3] dark:bg-[#0C3C32] rounded-lg flex items-center justify-between border border-emerald-950/10 dark:border-white/5"
+                    class="py-2 px-3.5 bg-[#F1F5F3] dark:bg-[#0C3C32] rounded-lg flex items-center justify-between border border-emerald-950/10 dark:border-white/5"
                   >
                     <div class="flex items-center gap-3">
                       <UIcon
@@ -849,7 +846,7 @@ onMounted(async () => {
           </div>
 
           <!-- BOUTONS DE NAVIGATION DU BAS -->
-          <div class="border-t border-gray-200 dark:border-gray-800 pt-6 mt-8 flex justify-between items-center bg-gray-50 dark:bg-[#0A332C] flex-shrink-0">
+          <div class="border-t border-gray-200 dark:border-gray-800 pt-4 mt-3 flex justify-between items-center bg-gray-50 dark:bg-[#0A332C] flex-shrink-0">
             <UButton
               v-if="currentStep > 1"
               color="primary"

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, numeric, integer, boolean, primaryKey, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, numeric, integer, boolean, primaryKey, jsonb, unique } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // ─── Core Entities ────────────────────────────────────────────────────────────
@@ -93,7 +93,9 @@ export const monthlyChecklists = pgTable('monthly_checklists', {
   selectedIncomeIds: jsonb('selected_income_ids').$type<string[]>().notNull().default([]),
   steps: jsonb('steps').$type<ChecklistStep[]>().notNull().default([]),
   createdAt: timestamp('created_at').defaultNow().notNull()
-})
+}, t => ({
+  userMonthUnique: unique('monthly_checklists_user_id_month_unique').on(t.userId, t.month)
+}))
 
 // Type local pour le JSONB des steps (utilisé par Drizzle $type)
 type ChecklistStep = {
