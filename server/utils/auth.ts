@@ -1,5 +1,6 @@
 import { serverSupabaseUser } from '#supabase/server'
 import type { H3Event } from 'h3'
+import { eq } from 'drizzle-orm'
 import { db } from '~~/server/database/db'
 import { profiles } from '~~/server/database/schema'
 
@@ -23,17 +24,35 @@ export async function requireUser(event: H3Event) {
   }
 
   try {
-    const name = (user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur') as string
-    const email = (user.email || `${userId}@placeholder.local`) as string
+    const existing = await db
+      .select({ id: profiles.id })
+      .from(profiles)
+      .where(eq(profiles.id, userId))
+      .limit(1)
 
-    await db.insert(profiles).values({
-      id: userId,
-      name,
-      email,
-      onboarded: false
-    }).onConflictDoNothing()
+    if (!existing[0]) {
+      const name = (user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur') as string
+      const email = (user.email || `${userId}@placeholder.local`) as string
+
+      try {
+        await db.insert(profiles).values({
+          id: userId,
+          name,
+          email,
+          onboarded: false
+        })
+      } catch (insertErr) {
+        console.warn('[requireUser] Email conflict, inserting with unique fallback email:', insertErr)
+        await db.insert(profiles).values({
+          id: userId,
+          name,
+          email: `${userId}@user.local`,
+          onboarded: false
+        }).onConflictDoNothing()
+      }
+    }
   } catch (err) {
-    console.error('Erreur lors de la synchronisation du profil utilisateur:', err)
+    console.error('[requireUser Sync Error]:', err)
   }
 
   return { user, userId }
