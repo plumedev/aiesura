@@ -46,11 +46,16 @@ export default defineEventHandler(async (event) => {
     return userProfile[0]
   } catch (error) {
     console.error('[GET /api/profile Error]:', error)
-    const err = error as { statusCode?: number, message?: string }
+    const err = error as { statusCode?: number, message?: string, code?: string, detail?: string, cause?: unknown }
     if (err.statusCode) throw error
+    const extra = [
+      err.code ? `[Code: ${err.code}]` : '',
+      err.detail ? `[Detail: ${err.detail}]` : '',
+      err.cause ? `[Cause: ${typeof err.cause === 'object' ? JSON.stringify(err.cause) : String(err.cause)}]` : ''
+    ].filter(Boolean).join(' ')
     throw createError({
       statusCode: 500,
-      message: err.message || 'Erreur lors de la récupération du profil'
+      message: `${err.message || 'Erreur lors de la récupération du profil'} ${extra}`.trim()
     })
   }
 })
