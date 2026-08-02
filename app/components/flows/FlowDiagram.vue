@@ -23,57 +23,89 @@ const computedFlowData = computed(() => {
   const transitsMap = new Map<string, { id: string, name: string, amount: number }>()
   const destinations: { id: string, name: string, amount: number, transitName?: string, ruleName: string }[] = []
 
+  // Normaliser les données sous forme d'éléments de flux (depuis steps ou depuis rules)
+  const flowItems = (props.steps && props.steps.length > 0)
+    ? props.steps.map((step, index) => ({
+        index,
+        name: step.name,
+        sourceName: step.sourceName || 'Source inconnue',
+        transitName: step.transitName || null,
+        destName: step.destName || 'Destination inconnue',
+        amount: Number(step.amount || 0)
+      }))
+    : props.rules.map((rule, index) => {
+        let amount = 0
+        if (rule.amountType === 'fixed') {
+          amount = Number(rule.amount || 0)
+        } else if (rule.linkedIterations && Array.isArray(rule.linkedIterations)) {
+          amount = rule.linkedIterations.reduce((sum, li) => {
+            return sum + (Number(li.amount || 0) * ((li.percentage || 100) / 100))
+          }, 0)
+        }
+        return {
+          index,
+          name: rule.purposeName,
+          sourceName: rule.sourceAccount?.name || 'Source inconnue',
+          transitName: rule.transitAccount ? rule.transitAccount.name : null,
+          destName: rule.destinationAccount?.name || 'Destination inconnue',
+          amount
+        }
+      })
+
   // 1. Identifier les comptes qui agissent comme comptes de transit
   const transitAccounts = new Set<string>()
-  props.steps.forEach((step) => {
-    if (step.transitName) {
-      transitAccounts.add(step.transitName)
+  flowItems.forEach((item) => {
+    if (item.transitName) {
+      transitAccounts.add(item.transitName)
     }
   })
 
-  props.steps.forEach((step, index) => {
-    const amount = Number(step.amount || 0)
+  // 2. Construire les sources, transits et destinations
+  flowItems.forEach((item) => {
+    const amount = item.amount
 
     // Source
-    const sourceName = step.sourceName || 'Source inconnue'
-    if (sourcesMap.has(sourceName)) {
-      sourcesMap.get(sourceName)!.amount += amount
+    if (sourcesMap.has(item.sourceName)) {
+      sourcesMap.get(item.sourceName)!.amount += amount
     } else {
-      sourcesMap.set(sourceName, { id: `src-${index}`, name: sourceName, amount })
+      sourcesMap.set(item.sourceName, { id: `src-${item.index}`, name: item.sourceName, amount })
     }
 
     // Transit & Destination
-    if (step.transitName) {
-      const transitName = step.transitName
-      if (transitsMap.has(transitName)) {
-        transitsMap.get(transitName)!.amount += amount
+    if (item.transitName) {
+      if (transitsMap.has(item.transitName)) {
+        transitsMap.get(item.transitName)!.amount += amount
       } else {
-        transitsMap.set(transitName, { id: `trans-${index}`, name: transitName, amount })
+        transitsMap.set(item.transitName, { id: `trans-${item.index}`, name: item.transitName, amount })
       }
 
-      const destName = step.destName || 'Destination inconnue'
       destinations.push({
-        id: `dest-${index}`,
-        name: destName,
+        id: `dest-${item.index}`,
+        name: item.destName,
         amount,
-        transitName,
-        ruleName: step.name
+        transitName: item.transitName,
+        ruleName: item.name
       })
-    } else if (transitAccounts.has(step.destName)) {
-      const transitName = step.destName
-      if (transitsMap.has(transitName)) {
-        transitsMap.get(transitName)!.amount += amount
+    } else if (transitAccounts.has(item.destName)) {
+      if (transitsMap.has(item.destName)) {
+        transitsMap.get(item.destName)!.amount += amount
       } else {
-        transitsMap.set(transitName, { id: `trans-${index}`, name: transitName, amount })
+        transitsMap.set(item.destName, { id: `trans-${item.index}`, name: item.destName, amount })
       }
-    } else {
-      const destName = step.destName || 'Destination inconnue'
       destinations.push({
-        id: `dest-${index}`,
-        name: destName,
+        id: `dest-${item.index}`,
+        name: item.destName,
         amount,
         transitName: undefined,
-        ruleName: step.name
+        ruleName: item.name
+      })
+    } else {
+      destinations.push({
+        id: `dest-${item.index}`,
+        name: item.destName,
+        amount,
+        transitName: undefined,
+        ruleName: item.name
       })
     }
   })
