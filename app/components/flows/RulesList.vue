@@ -51,11 +51,6 @@ const getRecurringRuleAmount = (rule: TransferRule): number => {
   }
   return total
 }
-
-const getRecurringRuleDetailsLabel = (rule: TransferRule): string => {
-  if (!rule.linkedIterations || rule.linkedIterations.length === 0) return 'Aucune transaction'
-  return rule.linkedIterations.map(li => `${li.name} (${li.percentage}%)`).join(', ')
-}
 </script>
 
 <template>
@@ -119,10 +114,45 @@ const getRecurringRuleDetailsLabel = (rule: TransferRule): string => {
         </div>
 
         <div
-          v-if="rule.amountType === 'recurring'"
-          class="text-[10px] text-gray-500 dark:text-gray-400 font-mono mt-1 bg-black/5 dark:bg-white/5 p-1.5 rounded truncate"
+          v-if="rule.amountType === 'recurring' && rule.linkedIterations && rule.linkedIterations.length > 0"
+          class="mt-2 pt-2 border-t border-black/10 dark:border-white/10 space-y-1.5 font-mono text-[11px]"
         >
-          Inclus : {{ getRecurringRuleDetailsLabel(rule) }}
+          <div class="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
+            Dépenses incluses ({{ rule.linkedIterations.length }})
+          </div>
+          <div class="space-y-1 max-h-36 overflow-y-auto pr-1">
+            <div
+              v-for="li in rule.linkedIterations"
+              :key="li.id"
+              class="flex items-center justify-between bg-black/5 dark:bg-white/5 px-2 py-1 rounded text-gray-700 dark:text-gray-300"
+            >
+              <div class="flex items-center gap-1.5 min-w-0">
+                <UIcon
+                  name="i-heroicons-arrow-right-tiny"
+                  class="w-3 h-3 text-gray-400 shrink-0"
+                />
+                <span class="font-medium text-gray-900 dark:text-white truncate">{{ li.name }}</span>
+                <span
+                  v-if="li.transaction?.account?.name"
+                  class="text-[9px] text-gray-400 dark:text-gray-500 shrink-0"
+                >({{ li.transaction.account.name }})</span>
+              </div>
+              <div class="flex items-center gap-1 shrink-0 ml-2">
+                <UBadge
+                  v-if="li.percentage < 100"
+                  size="xs"
+                  variant="soft"
+                  color="neutral"
+                  class="text-[9px]"
+                >
+                  {{ li.percentage }}%
+                </UBadge>
+                <span class="font-semibold text-gray-900 dark:text-white">
+                  {{ formatAmount(Number(li.amount || 0) * (li.percentage / 100)) }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
