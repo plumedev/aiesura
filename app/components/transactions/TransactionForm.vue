@@ -110,6 +110,34 @@ const dateModel = computed({
   }
 })
 
+const occurrenceCount = computed(() => {
+  if (!state.hasEndDate || !state.startDate || !state.endDate) return 0
+  const start = new Date(state.startDate)
+  const end = new Date(state.endDate)
+
+  start.setHours(0, 0, 0, 0)
+  end.setHours(0, 0, 0, 0)
+
+  if (end < start) return 0
+  if (state.frequency === 'once') return 1
+
+  let count = 0
+  const current = new Date(start)
+
+  while (current <= end) {
+    count++
+    if (state.frequency === 'monthly') {
+      current.setMonth(current.getMonth() + 1)
+    } else if (state.frequency === 'quarterly') {
+      current.setMonth(current.getMonth() + 3)
+    } else if (state.frequency === 'yearly') {
+      current.setFullYear(current.getFullYear() + 1)
+    }
+  }
+
+  return count
+})
+
 async function executeSubmit(mode?: 'all' | 'future' | 'single') {
   loading.value = true
   if (mode !== 'single') {
@@ -196,6 +224,7 @@ async function submitEdit(mode: 'all' | 'future') {
           v-model="state.amount"
           type="number"
           step="0.01"
+          placeholder="Ex: 50.00"
           class="w-full"
         />
       </UFormField>
@@ -267,6 +296,16 @@ async function submitEdit(mode: 'all' | 'future') {
             />
           </template>
         </UPopover>
+        <p
+          v-if="state.hasEndDate && occurrenceCount > 0"
+          class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1"
+        >
+          <UIcon
+            name="i-lucide-info"
+            class="w-3.5 h-3.5 shrink-0 text-[#0A332C] dark:text-[#50E8A8]"
+          />
+          <span>Soit <strong>{{ occurrenceCount }}</strong> transaction{{ occurrenceCount > 1 ? 's' : '' }} générée{{ occurrenceCount > 1 ? 's' : '' }}</span>
+        </p>
       </UFormField>
 
       <div class="flex items-center gap-2 mt-7">

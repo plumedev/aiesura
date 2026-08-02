@@ -43,6 +43,7 @@ Bien que les "slash commands" natives de l'interface soient limitées, je **dois
 ## Design & UI
 *   **Couleurs des conteneurs :** Le fond des conteneurs (cartes, tableaux, etc.) doit être `#F1F5F3` en mode light et `#0C3C32` en mode dark pour conserver la cohérence visuelle du projet.
 *   **Modales de confirmation :** Toute action de confirmation ou de suppression destructive DOIT être développée avec un composant de modale personnalisé (`UModal`) de Nuxt UI. L'utilisation des alertes ou confirmations natives du navigateur (`confirm()`, `alert()`) est strictement interdite.
+*   **Placeholders obligatoires sur les champs de saisie :** Tout champ de formulaire (`<UInput>`, `<UTextarea>`, etc.) DOIT impérativement comporter un attribut `placeholder` clair et explicatif (ex: `placeholder="Ex: 50.00"`) pour guider l'utilisateur sur la valeur attendue.
 *   **Design System (`design.md`) :** Chaque fois qu'une nouvelle convention de design est introduite ou modifiée (ex: style de tableau, header sticky, couleur de bouton), je DOIS demander à l'utilisateur s'il faut mettre à jour le fichier `openspec/design.md` pour refléter ce changement.
 
 ## Conventions API Serveur (Nitro / Drizzle)
