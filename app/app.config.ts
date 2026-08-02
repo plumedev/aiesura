@@ -20,12 +20,12 @@ export default defineAppConfig({
     modal: {
       slots: {
         content: 'rounded-md glass-panel sm:rounded-md !ring-0 !border-none !shadow-none',
-        overlay: 'bg-black/20 dark:bg-black/40'
+        overlay: 'bg-black/30 backdrop-blur-[2.5px] dark:bg-black/50 backdrop-blur-[2.5px]'
       }
     },
     toast: {
       slots: {
-        root: 'rounded-md glass-panel !ring-0 !border-none shadow-lg'
+        root: 'rounded-md toast-glass !ring-0 !border-none shadow-lg'
       }
     },
     dropdownMenu: {

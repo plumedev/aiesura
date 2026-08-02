@@ -61,7 +61,9 @@ const incomeForm = reactive({
   amount: undefined as number | undefined,
   accountId: '',
   frequency: 'monthly' as 'once' | 'monthly' | 'quarterly' | 'yearly',
-  startDate: new Date().toISOString().substring(0, 10)
+  startDate: new Date().toISOString().substring(0, 10),
+  hasEndDate: false,
+  endDate: undefined as string | undefined
 })
 
 const expenseForm = reactive({
@@ -69,7 +71,9 @@ const expenseForm = reactive({
   amount: undefined as number | undefined,
   accountId: '',
   frequency: 'monthly' as 'once' | 'monthly' | 'quarterly' | 'yearly',
-  startDate: new Date().toISOString().substring(0, 10)
+  startDate: new Date().toISOString().substring(0, 10),
+  hasEndDate: false,
+  endDate: undefined as string | undefined
 })
 
 // --- Options pour les sélecteurs ---
@@ -161,6 +165,7 @@ async function handleCreateIncome() {
   submitting.value = true
   try {
     const startIso = new Date(incomeForm.startDate).toISOString()
+    const endIso = (incomeForm.hasEndDate && incomeForm.endDate) ? new Date(incomeForm.endDate).toISOString() : null
     await $fetch('/api/transactions', {
       method: 'POST',
       body: {
@@ -169,11 +174,14 @@ async function handleCreateIncome() {
         accountId: incomeForm.accountId,
         type: 'income',
         frequency: incomeForm.frequency,
-        startDate: startIso
+        startDate: startIso,
+        endDate: endIso
       }
     })
     incomeForm.name = ''
     incomeForm.amount = undefined
+    incomeForm.hasEndDate = false
+    incomeForm.endDate = undefined
     toast.add({ title: 'Revenu ajouté !', color: 'success' })
     await fetchTransactions()
   } catch (err: unknown) {
@@ -189,6 +197,7 @@ async function handleCreateExpense() {
   submitting.value = true
   try {
     const startIso = new Date(expenseForm.startDate).toISOString()
+    const endIso = (expenseForm.hasEndDate && expenseForm.endDate) ? new Date(expenseForm.endDate).toISOString() : null
     await $fetch('/api/transactions', {
       method: 'POST',
       body: {
@@ -197,11 +206,14 @@ async function handleCreateExpense() {
         accountId: expenseForm.accountId,
         type: 'expense',
         frequency: expenseForm.frequency,
-        startDate: startIso
+        startDate: startIso,
+        endDate: endIso
       }
     })
     expenseForm.name = ''
     expenseForm.amount = undefined
+    expenseForm.hasEndDate = false
+    expenseForm.endDate = undefined
     toast.add({ title: 'Dépense ajoutée !', color: 'success' })
     await fetchTransactions()
   } catch (err: unknown) {
@@ -328,7 +340,7 @@ onMounted(async () => {
             @click="goToStep(1)"
           >
             <div
-              class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
+              class="w-9 h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
               :class="currentStep >= 1 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
             >
               1
@@ -350,7 +362,7 @@ onMounted(async () => {
             @click="goToStep(2)"
           >
             <div
-              class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
+              class="w-9 h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
               :class="currentStep >= 2 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
             >
               2
@@ -372,7 +384,7 @@ onMounted(async () => {
             @click="goToStep(3)"
           >
             <div
-              class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
+              class="w-9 h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
               :class="currentStep >= 3 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
             >
               3
@@ -631,6 +643,24 @@ onMounted(async () => {
                     />
                   </UFormField>
 
+                  <div class="flex items-center gap-2 pb-2">
+                    <USwitch v-model="incomeForm.hasEndDate" />
+                    <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Date de fin</span>
+                  </div>
+
+                  <UFormField
+                    v-if="incomeForm.hasEndDate"
+                    label="Date de fin"
+                    name="incomeEndDate"
+                  >
+                    <UInput
+                      v-model="incomeForm.endDate"
+                      type="date"
+                      required
+                      class="w-full"
+                    />
+                  </UFormField>
+
                   <UFormField class="w-full">
                     <template #label>
                       <span class="opacity-0 select-none">-</span>
@@ -771,6 +801,24 @@ onMounted(async () => {
                   >
                     <UInput
                       v-model="expenseForm.startDate"
+                      type="date"
+                      required
+                      class="w-full"
+                    />
+                  </UFormField>
+
+                  <div class="flex items-center gap-2 pb-2">
+                    <USwitch v-model="expenseForm.hasEndDate" />
+                    <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Date de fin</span>
+                  </div>
+
+                  <UFormField
+                    v-if="expenseForm.hasEndDate"
+                    label="Date de fin"
+                    name="expenseEndDate"
+                  >
+                    <UInput
+                      v-model="expenseForm.endDate"
                       type="date"
                       required
                       class="w-full"

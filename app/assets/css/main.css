@@ -52,14 +52,60 @@ body {
 
 /* Utilitaires Glassmorphisme / Surfaces */
 .glass-panel {
-  background-color: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background-color: #F1F5F3 !important;
 }
 
 .dark .glass-panel {
-  background-color: rgba(15, 80, 64, 0.3) !important;
+  background-color: #0C3C32 !important;
 }
+
+/* Glassmorphism transparent avec flou pour les notifications / toasts */
+.toast-glass {
+  background-color: rgba(241, 245, 243, 0.4) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.dark .toast-glass {
+  background-color: rgba(12, 60, 50, 0.45) !important;
+}
+
+/* ── Custom Scrollbars ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #C2D1C9 transparent;
+}
+
+.dark * {
+  scrollbar-color: #155A4C transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C2D1C9;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A3B8AC;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #155A4C;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #1F7A67;
+}
+
 
 /* ── Thème personnalisé pour vue-owldate (OwlDatePicker) ── */
 .vod {
