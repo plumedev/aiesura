@@ -12,19 +12,36 @@ jobs:
     steps:
       - name: Ping Supabase REST API
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL || vars.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY || secrets.SUPABASE_ANON_KEY || vars.SUPABASE_KEY || vars.SUPABASE_ANON_KEY }}
+          RAW_URL: ${{ secrets.SUPABASE_URL || vars.SUPABASE_URL }}
+          RAW_KEY: ${{ secrets.SUPABASE_KEY || secrets.SUPABASE_ANON_KEY || vars.SUPABASE_KEY || vars.SUPABASE_ANON_KEY }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
-            echo "::error::Secrets introuvables. Vérifiez que SUPABASE_URL et SUPABASE_KEY (ou SUPABASE_ANON_KEY) sont bien configurés dans GitHub."
+          if [ -z "$RAW_URL" ] || [ -z "$RAW_KEY" ]; then
+            echo "::error::Secrets introuvables. Vérifiez que SUPABASE_URL et SUPABASE_KEY sont bien configurés dans GitHub Secrets."
             exit 1
           fi
 
-          echo "Envoi d'un ping à l'API Supabase..."
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "apikey: $SUPABASE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_KEY" \
-            "$SUPABASE_URL/rest/v1/")
+          # Nettoyer les guillemets éventuels (" ou ') et les espaces copiés par erreur
+          URL=$(echo "$RAW_URL" | sed -e 's/^[[:space:]"'\''"]*//' -e 's/[[:space:]"'\''"]*$//' -e 's/\/$//')
+          KEY=$(echo "$RAW_KEY" | sed -e 's/^[[:space:]"'\''"]*//' -e 's/[[:space:]"'\''"]*$//')
+
+          # S'assurer du préfixe https://
+          if [[ ! "$URL" =~ ^https?:// ]]; then
+            URL="https://$URL"
+          fi
+
+          TARGET_ENDPOINT="${URL}/rest/v1/"
+          echo "Envoi d'un ping à l'API Supabase vers $TARGET_ENDPOINT..."
+
+          HTTP_STATUS=$(curl -s -S -o /dev/null -w "%{http_code}" \
+            -H "apikey: $KEY" \
+            -H "Authorization: Bearer $KEY" \
+            "$TARGET_ENDPOINT" 2>&1) || CURL_EXIT=$?
+
+          if [ -n "$CURL_EXIT" ] && [ "$CURL_EXIT" -ne 0 ]; then
+            echo "::error::Échec de la commande curl (Code d'erreur curl: $CURL_EXIT). Vérifiez la valeur de SUPABASE_URL dans GitHub Secrets."
+            echo "Détails: $HTTP_STATUS"
+            exit 1
+          fi
 
           echo "Statut HTTP retourné: $HTTP_STATUS"
 
