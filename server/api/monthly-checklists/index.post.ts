@@ -16,7 +16,8 @@ const stepSchema = z.object({
   amount: z.number(),
   completed: z.boolean(),
   transitCompleted: z.boolean(),
-  amountType: z.string()
+  amountType: z.string(),
+  isMonthlyOverride: z.boolean().optional().default(false)
 })
 
 const createChecklistSchema = z.object({

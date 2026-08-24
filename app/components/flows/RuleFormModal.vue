@@ -1,21 +1,26 @@
 <script setup lang="ts">
-import type { TransactionIteration, TransferRule } from '~/types'
+import type { TransactionIteration, TransferRule, ChecklistStep } from '~/types'
 
 interface Account {
   id: string
   name: string
 }
 
+type EditableRule = TransferRule | (ChecklistStep & { id?: string })
+
 const props = defineProps<{
   open: boolean
-  rule?: TransferRule | null
+  rule?: EditableRule | null
   iterations: TransactionIteration[]
   accounts: Account[]
+  monthLabel?: string
+  hasCurrentPlan?: boolean
 }>()
 
 const emit = defineEmits<{
   close: []
   created: []
+  saveMonthly: [step: ChecklistStep]
 }>()
 
 const handleClose = () => emit('close')
@@ -23,6 +28,19 @@ const handleClose = () => emit('close')
 const toast = useToast()
 const loading = ref(false)
 const isEdit = computed(() => !!props.rule)
+
+const scope = ref<'month' | 'global'>('global')
+
+const scopeOptions = computed(() => [
+  {
+    label: props.monthLabel ? `Ce mois uniquement (${props.monthLabel})` : 'Ce mois uniquement',
+    value: 'month'
+  },
+  {
+    label: 'Modèle global (tous les mois)',
+    value: 'global'
+  }
+])
 
 const form = reactive({
   purposeName: '',
@@ -82,27 +100,53 @@ const resetForm = () => {
   form.amountType = 'fixed'
   form.amount = undefined
   form.iterations = []
+  scope.value = props.hasCurrentPlan ? 'month' : 'global'
 }
 
-// Remplir le formulaire si on est en mode édition
+// Remplir le formulaire selon le type d'objet édité (TransferRule ou ChecklistStep)
 watch(() => props.rule, (newRule) => {
   if (newRule) {
-    form.purposeName = newRule.purposeName
-    form.sourceAccountId = newRule.sourceAccount.id
-    form.transitAccountId = newRule.transitAccount ? newRule.transitAccount.id : 'none'
-    form.destinationAccountId = newRule.destinationAccount.id
-    form.amountType = newRule.amountType
-    form.amount = newRule.amount ? Number(newRule.amount) : undefined
-    form.iterations = newRule.linkedIterations
-      ? newRule.linkedIterations.map(li => ({
-          id: li.id,
-          percentage: li.percentage
-        }))
-      : []
+    if ('sourceAccount' in newRule) {
+      // Cas TransferRule standard
+      form.purposeName = newRule.purposeName
+      form.sourceAccountId = newRule.sourceAccount.id
+      form.transitAccountId = newRule.transitAccount ? newRule.transitAccount.id : 'none'
+      form.destinationAccountId = newRule.destinationAccount.id
+      form.amountType = newRule.amountType
+      form.amount = newRule.amount ? Number(newRule.amount) : undefined
+      form.iterations = newRule.linkedIterations
+        ? newRule.linkedIterations.map(li => ({
+            id: li.id,
+            percentage: li.percentage
+          }))
+        : []
+      scope.value = props.hasCurrentPlan ? 'month' : 'global'
+    } else {
+      // Cas ChecklistStep (étape d'un plan mensuel)
+      form.purposeName = newRule.name
+      form.sourceAccountId = newRule.sourceAccountId
+      form.transitAccountId = newRule.transitAccountId ? newRule.transitAccountId : 'none'
+      form.destinationAccountId = newRule.destAccountId
+      form.amountType = (newRule.amountType as 'fixed' | 'recurring') || 'fixed'
+      form.amount = Number(newRule.amount)
+      form.iterations = []
+      scope.value = newRule.isMonthlyOverride ? 'month' : (props.hasCurrentPlan ? 'month' : 'global')
+    }
   } else {
     resetForm()
   }
 }, { immediate: true })
+
+const computeRecurringAmount = (): number => {
+  let total = 0
+  form.iterations.forEach((item) => {
+    const it = props.iterations.find(i => i.id === item.id)
+    if (it) {
+      total += Number(it.amount || 0) * (item.percentage / 100)
+    }
+  })
+  return total
+}
 
 const handleSubmit = async () => {
   if (!form.purposeName.trim()) {
@@ -125,33 +169,75 @@ const handleSubmit = async () => {
     toast.add({ title: 'Le montant est requis', color: 'error' })
     return
   }
-  if (form.amountType === 'recurring' && form.iterations.length === 0) {
-    toast.add({ title: 'Sélectionnez au moins une transaction', color: 'error' })
+  if (form.amountType === 'recurring' && form.iterations.length === 0 && scope.value === 'global') {
+    toast.add({ title: 'Sélectionnez au moins une transaction récurrente', color: 'error' })
     return
   }
 
   loading.value = true
   try {
-    const url = isEdit.value ? `/api/transfer-rules/${props.rule!.id}` : '/api/transfer-rules'
-    const method = isEdit.value ? 'PATCH' : 'POST'
+    if (scope.value === 'month' && props.hasCurrentPlan) {
+      // Sauvegarde ciblée sur le plan du mois en cours
+      const sourceAccount = props.accounts.find(a => a.id === form.sourceAccountId)
+      const destAccount = props.accounts.find(a => a.id === form.destinationAccountId)
+      const transitAccount = form.transitAccountId !== 'none'
+        ? props.accounts.find(a => a.id === form.transitAccountId)
+        : null
 
-    await $fetch(url, {
-      method,
-      body: {
-        purposeName: form.purposeName,
+      const calculatedAmount = form.amountType === 'fixed'
+        ? Number(form.amount || 0)
+        : (form.iterations.length > 0 ? computeRecurringAmount() : Number(form.amount || 0))
+
+      const existingRuleId = props.rule
+        ? ('ruleId' in props.rule ? props.rule.ruleId : props.rule.id)
+        : `monthly-${Date.now()}`
+
+      const step: ChecklistStep = {
+        ruleId: existingRuleId,
+        name: form.purposeName,
+        sourceName: sourceAccount?.name || 'Source',
         sourceAccountId: form.sourceAccountId,
-        transitAccountId: form.transitAccountId === 'none' ? null : form.transitAccountId,
-        destinationAccountId: form.destinationAccountId,
+        transitName: transitAccount ? transitAccount.name : null,
+        transitAccountId: transitAccount ? transitAccount.id : null,
+        destName: destAccount?.name || 'Destination',
+        destAccountId: form.destinationAccountId,
+        amount: calculatedAmount,
+        completed: (props.rule && 'completed' in props.rule) ? Boolean(props.rule.completed) : false,
+        transitCompleted: (props.rule && 'transitCompleted' in props.rule) ? Boolean(props.rule.transitCompleted) : false,
         amountType: form.amountType,
-        amount: form.amountType === 'fixed' ? form.amount : undefined,
-        iterations: form.amountType === 'recurring' ? form.iterations : undefined
+        isMonthlyOverride: true
       }
-    })
 
-    toast.add({ title: isEdit.value ? 'Règle modifiée avec succès' : 'Règle créée avec succès', color: 'success' })
-    resetForm()
-    emit('created')
-    handleClose()
+      emit('saveMonthly', step)
+      resetForm()
+      handleClose()
+    } else {
+      // Sauvegarde dans le modèle global (transfer_rules)
+      const globalRuleId = props.rule && 'sourceAccount' in props.rule ? props.rule.id : null
+      const url = globalRuleId ? `/api/transfer-rules/${globalRuleId}` : '/api/transfer-rules'
+      const method = globalRuleId ? 'PATCH' : 'POST'
+
+      await $fetch(url, {
+        method,
+        body: {
+          purposeName: form.purposeName,
+          sourceAccountId: form.sourceAccountId,
+          transitAccountId: form.transitAccountId === 'none' ? null : form.transitAccountId,
+          destinationAccountId: form.destinationAccountId,
+          amountType: form.amountType,
+          amount: form.amountType === 'fixed' ? form.amount : undefined,
+          iterations: form.amountType === 'recurring' ? form.iterations : undefined
+        }
+      })
+
+      toast.add({
+        title: globalRuleId ? 'Modèle global modifié avec succès' : 'Règle créée avec succès',
+        color: 'success'
+      })
+      resetForm()
+      emit('created')
+      handleClose()
+    }
   } catch {
     toast.add({ title: 'Erreur lors de l\'enregistrement de la règle', color: 'error' })
   } finally {
@@ -164,9 +250,27 @@ const handleSubmit = async () => {
   <AppModal
     :open="open"
     :title="isEdit ? 'Modifier la règle de virement' : 'Créer une règle de virement'"
-    @update:open="handleClose"
+    :confirm-label="isEdit ? 'Enregistrer' : 'Créer'"
+    confirm-color="primary"
+    :loading="loading"
+    @confirm="handleSubmit"
+    @cancel="handleClose"
+    @update:open="(val) => { if (!val) handleClose() }"
   >
-    <div class="space-y-4">
+    <div class="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+      <!-- Choix de portée (si plan de mois actif) -->
+      <UFormField
+        v-if="hasCurrentPlan"
+        label="Portée de l'action"
+        help="Choisissez si cette action s'applique uniquement au mois affiché ou au modèle permanent."
+      >
+        <USelect
+          v-model="scope"
+          :items="scopeOptions"
+          class="w-full font-medium"
+        />
+      </UFormField>
+
       <!-- Nom -->
       <UFormField
         label="Nom de la règle"
@@ -188,7 +292,7 @@ const handleSubmit = async () => {
           <USelect
             v-model="form.sourceAccountId"
             :items="accountOptions"
-            placeholder="Source"
+            placeholder="Compte source..."
             class="w-full"
           />
         </UFormField>
@@ -198,6 +302,7 @@ const handleSubmit = async () => {
           <USelect
             v-model="form.transitAccountId"
             :items="transitAccountOptions"
+            placeholder="Compte de transit..."
             class="w-full"
           />
         </UFormField>
@@ -210,7 +315,7 @@ const handleSubmit = async () => {
           <USelect
             v-model="form.destinationAccountId"
             :items="accountOptions"
-            placeholder="Destination"
+            placeholder="Compte destination..."
             class="w-full"
           />
         </UFormField>
@@ -225,6 +330,7 @@ const handleSubmit = async () => {
           <USelect
             v-model="form.amountType"
             :items="amountTypeOptions"
+            placeholder="Type de montant..."
             class="w-full"
           />
         </UFormField>
@@ -240,16 +346,16 @@ const handleSubmit = async () => {
             type="number"
             min="0"
             step="0.01"
-            placeholder="500"
+            placeholder="Ex : 500.00"
             class="w-full"
           />
         </UFormField>
       </div>
 
-      <!-- Itérations récurrentes -->
+      <!-- Itérations récurrentes (uniquement pour le modèle global ou calcul initial) -->
       <div
         v-if="form.amountType === 'recurring'"
-        class="space-y-3 border border-default p-4 rounded-lg bg-surface/50 max-h-60 overflow-y-auto"
+        class="space-y-3 border border-black/10 dark:border-white/10 p-4 rounded-lg bg-black/5 dark:bg-white/5 max-h-60 overflow-y-auto"
       >
         <div class="text-xs font-bold text-gray-500 dark:text-gray-400 font-mono uppercase tracking-wider mb-2">
           Associer des transactions récurrentes
@@ -300,24 +406,5 @@ const handleSubmit = async () => {
         </div>
       </div>
     </div>
-
-    <template #footer>
-      <div class="flex justify-end gap-2">
-        <UButton
-          variant="ghost"
-          color="neutral"
-          :disabled="loading"
-          @click="handleClose"
-        >
-          Annuler
-        </UButton>
-        <UButton
-          :loading="loading"
-          @click="handleSubmit"
-        >
-          {{ isEdit ? 'Enregistrer' : 'Créer' }}
-        </UButton>
-      </div>
-    </template>
   </AppModal>
 </template>

@@ -23,6 +23,7 @@ Ces règles définissent le workflow strict à suivre pour ce projet. Je dois m'
 *   Je dois être proactif dans la proposition de création de tickets Linear.
 *   Je ne dois jamais coder "à l'aveugle" sans qu'une spec ne soit d'abord actée dans le dossier OpenSpec.
 *   Lorsqu'un choix technique ou métier s'impose (notamment en phase d'idéation/exploration), je dois SYSTÉMATIQUEMENT utiliser l'outil interactif `ask_question` pour soumettre les options à l'utilisateur, plutôt que de poser la question au format texte.
+*   **Tests unitaires :** Ne JAMAIS créer ou ajouter de tests unitaires (Vitest, etc.) à moins que l'utilisateur ne le demande explicitement.
 *   **Qualité du code :** Après chaque modification de code (implémentation ou refactoring), je dois AUTOMATIQUEMENT exécuter conjointement `npm run lint` ET `npm run typecheck` SANS demander de confirmation à l'utilisateur. Je dois utiliser ces commandes pour vérifier la validité du projet et corriger les erreurs éventuelles avant de finaliser ma réponse.
 
 ## Conventions de Nommage

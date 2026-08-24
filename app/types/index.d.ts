@@ -76,6 +76,7 @@ export interface ChecklistStep {
   completed: boolean
   transitCompleted: boolean
   amountType: string
+  isMonthlyOverride?: boolean
 }
 
 export interface GroupedTransitStep {

@@ -111,6 +111,7 @@ type ChecklistStep = {
   completed: boolean
   transitCompleted: boolean
   amountType: string
+  isMonthlyOverride?: boolean
 }
 
 // ─── Relations ────────────────────────────────────────────────────────────────

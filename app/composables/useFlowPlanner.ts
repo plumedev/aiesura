@@ -39,16 +39,18 @@ export function useFlowPlanner() {
   ): ChecklistStep[] => {
     const steps: ChecklistStep[] = []
 
-    // Capturer les anciens états cochés si demandé
-    const completedRuleIds = new Set<string>()
-    const completedTransitRuleIds = new Set<string>()
+    // Capturer les anciens états et overrides si demandé
+    const prevStepsByRuleId = new Map<string, ChecklistStep>()
+    const customMonthlySteps: ChecklistStep[] = []
+
     if (preserveCompleted && previousSteps && previousSteps.length > 0) {
+      const blueprintRuleIds = new Set(rules.map(r => r.id))
       previousSteps.forEach((s) => {
-        if (s.completed) {
-          completedRuleIds.add(s.ruleId)
-        }
-        if (s.transitCompleted) {
-          completedTransitRuleIds.add(s.ruleId)
+        if (blueprintRuleIds.has(s.ruleId)) {
+          prevStepsByRuleId.set(s.ruleId, s)
+        } else if (s.isMonthlyOverride) {
+          // Étape ponctuelle créée uniquement pour ce mois
+          customMonthlySteps.push(s)
         }
       })
     }
@@ -58,35 +60,67 @@ export function useFlowPlanner() {
 
     // Trier les règles : fixed et recurring d'abord
     const sortedRules = [...rules].sort((a, b) => {
-      // remaining ou autre si implémenté plus tard
       return a.order - b.order
     })
 
     sortedRules.forEach((rule) => {
-      const sourceName = rule.sourceAccount?.name || 'Source inconnue'
+      const prevStep = prevStepsByRuleId.get(rule.id)
 
-      // Initialiser le solde du compte principal avec le salaire total calculé
+      // Si l'étape avait été modifiée spécifiquement pour ce mois, conserver ses personnalisations
+      if (prevStep && prevStep.isMonthlyOverride) {
+        const sourceName = prevStep.sourceName || rule.sourceAccount?.name || 'Source inconnue'
+        if (!remainingSalaries.has(sourceName)) {
+          remainingSalaries.set(sourceName, salary)
+        }
+        const currentBalance = remainingSalaries.get(sourceName) || 0
+        remainingSalaries.set(sourceName, currentBalance - prevStep.amount)
+
+        steps.push({
+          ...prevStep,
+          completed: preserveCompleted ? prevStep.completed : false,
+          transitCompleted: preserveCompleted ? prevStep.transitCompleted : false,
+          isMonthlyOverride: true
+        })
+      } else {
+        const sourceName = rule.sourceAccount?.name || 'Source inconnue'
+        if (!remainingSalaries.has(sourceName)) {
+          remainingSalaries.set(sourceName, salary)
+        }
+
+        const amount = getIterationAmountForMonth(rule, month)
+        const currentBalance = remainingSalaries.get(sourceName) || 0
+        remainingSalaries.set(sourceName, currentBalance - amount)
+
+        steps.push({
+          ruleId: rule.id,
+          name: rule.purposeName,
+          sourceName,
+          sourceAccountId: rule.sourceAccount?.id || '',
+          transitName: rule.transitAccount ? rule.transitAccount.name : null,
+          transitAccountId: rule.transitAccount ? rule.transitAccount.id : null,
+          destName: rule.destinationAccount?.name || 'Destination inconnue',
+          destAccountId: rule.destinationAccount?.id || '',
+          amount,
+          completed: preserveCompleted && prevStep ? prevStep.completed : false,
+          transitCompleted: preserveCompleted && prevStep ? prevStep.transitCompleted : false,
+          amountType: rule.amountType,
+          isMonthlyOverride: false
+        })
+      }
+    })
+
+    // Ajouter les étapes personnalisées ponctuelles du mois
+    customMonthlySteps.forEach((customStep) => {
+      const sourceName = customStep.sourceName || 'Source inconnue'
       if (!remainingSalaries.has(sourceName)) {
         remainingSalaries.set(sourceName, salary)
       }
-
-      const amount = getIterationAmountForMonth(rule, month)
       const currentBalance = remainingSalaries.get(sourceName) || 0
-      remainingSalaries.set(sourceName, currentBalance - amount)
+      remainingSalaries.set(sourceName, currentBalance - customStep.amount)
 
       steps.push({
-        ruleId: rule.id,
-        name: rule.purposeName,
-        sourceName,
-        sourceAccountId: rule.sourceAccount?.id || '',
-        transitName: rule.transitAccount ? rule.transitAccount.name : null,
-        transitAccountId: rule.transitAccount ? rule.transitAccount.id : null,
-        destName: rule.destinationAccount?.name || 'Destination inconnue',
-        destAccountId: rule.destinationAccount?.id || '',
-        amount,
-        completed: preserveCompleted ? completedRuleIds.has(rule.id) : false,
-        transitCompleted: preserveCompleted ? completedTransitRuleIds.has(rule.id) : false,
-        amountType: rule.amountType
+        ...customStep,
+        isMonthlyOverride: true
       })
     })
 

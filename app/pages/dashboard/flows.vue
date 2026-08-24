@@ -144,14 +144,14 @@ watch([currentChecklist, incomeIterations], ([checklistVal, iterationsVal]) => {
 // ─── Modal Règle (Créer / Modifier) ───────────────────────────────────────────
 
 const isModalOpen = ref(false)
-const selectedRule = ref<TransferRule | null>(null)
+const selectedRule = ref<TransferRule | ChecklistStep | null>(null)
 
 const openCreateModal = () => {
   selectedRule.value = null
   isModalOpen.value = true
 }
 
-const openEditModal = (rule: TransferRule) => {
+const openEditModal = (rule: TransferRule | ChecklistStep) => {
   selectedRule.value = rule
   isModalOpen.value = true
 }
@@ -165,6 +165,45 @@ const onRuleSaved = async () => {
   await refreshRules()
   if (currentChecklist.value) {
     await triggerGenerateChecklist(true)
+  }
+}
+
+const handleSaveMonthlyStep = async (step: ChecklistStep) => {
+  if (!currentChecklist.value) return
+  try {
+    const currentSteps = currentChecklist.value.steps || []
+    const existingIndex = currentSteps.findIndex(s => s.ruleId === step.ruleId)
+    let updatedSteps: ChecklistStep[] = []
+    if (existingIndex >= 0) {
+      updatedSteps = [...currentSteps]
+      updatedSteps[existingIndex] = { ...step, isMonthlyOverride: true }
+    } else {
+      updatedSteps = [...currentSteps, { ...step, isMonthlyOverride: true }]
+    }
+
+    const result = await $fetch<MonthlyChecklist>(`/api/monthly-checklists/${currentChecklist.value.id}`, {
+      method: 'PATCH',
+      body: { steps: updatedSteps }
+    })
+    currentChecklist.value = result
+    toast.add({ title: 'Étape enregistrée pour ce mois uniquement', color: 'success' })
+  } catch {
+    toast.add({ title: 'Erreur lors de la mise à jour de la checklist', color: 'error' })
+  }
+}
+
+const handleDeleteMonthlyStep = async (ruleId: string) => {
+  if (!currentChecklist.value) return
+  try {
+    const updatedSteps = (currentChecklist.value.steps || []).filter(s => s.ruleId !== ruleId)
+    const result = await $fetch<MonthlyChecklist>(`/api/monthly-checklists/${currentChecklist.value.id}`, {
+      method: 'PATCH',
+      body: { steps: updatedSteps }
+    })
+    currentChecklist.value = result
+    toast.add({ title: 'Règle retirée pour ce mois uniquement', color: 'success' })
+  } catch {
+    toast.add({ title: 'Erreur lors du retrait de la règle mensuelle', color: 'error' })
   }
 }
 
@@ -434,8 +473,12 @@ const onRuleDeleted = async () => {
             </div>
             <FlowsRulesList
               :rules="rules ?? []"
+              :monthly-steps="currentChecklist?.steps ?? []"
+              :has-current-plan="!!currentChecklist"
+              :month-label="monthLabel"
               @edit="openEditModal"
               @deleted="onRuleDeleted"
+              @delete-monthly="handleDeleteMonthlyStep"
             />
           </div>
 
@@ -475,8 +518,11 @@ const onRuleDeleted = async () => {
         :rule="selectedRule"
         :iterations="iterations ?? []"
         :accounts="accounts ?? []"
+        :month-label="monthLabel"
+        :has-current-plan="!!currentChecklist"
         @close="closeModal"
         @created="onRuleSaved"
+        @save-monthly="handleSaveMonthlyStep"
       />
     </template>
   </UDashboardPanel>
