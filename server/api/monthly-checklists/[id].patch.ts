@@ -5,18 +5,19 @@ import { monthlyChecklists } from '~~/server/database/schema'
 import { and, eq } from 'drizzle-orm'
 
 const stepSchema = z.object({
-  ruleId: z.string().uuid(),
+  ruleId: z.string(),
   name: z.string(),
   sourceName: z.string(),
-  sourceAccountId: z.string().uuid(),
-  transitName: z.string().nullable(),
-  transitAccountId: z.string().uuid().nullable(),
+  sourceAccountId: z.string().optional().default(''),
+  transitName: z.string().nullable().optional().transform(val => val ?? null),
+  transitAccountId: z.string().nullable().optional().transform(val => val ?? null),
   destName: z.string(),
-  destAccountId: z.string().uuid(),
+  destAccountId: z.string().optional().default(''),
   amount: z.number(),
   completed: z.boolean(),
   transitCompleted: z.boolean(),
-  amountType: z.string()
+  amountType: z.string(),
+  isMonthlyOverride: z.boolean().optional().default(false)
 })
 
 const patchChecklistSchema = z.object({

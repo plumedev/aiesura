@@ -149,10 +149,10 @@ const computedFlowData = computed(() => {
     </div>
 
     <div
-      v-if="rules.length === 0"
+      v-if="computedFlowData.sources.length === 0"
       class="text-center py-12 text-gray-500 dark:text-gray-400 font-mono text-xs"
     >
-      Aucune règle de transfert configurée pour générer le schéma.
+      Aucun flux configuré pour générer le schéma.
     </div>
 
     <div
