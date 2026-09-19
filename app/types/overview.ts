@@ -29,9 +29,9 @@ export interface TransactionWithIterations {
 
 export interface OverviewFilters {
   search: string
-  type: TransactionType | null
+  type?: TransactionType
   accountIds: string[]
-  amountRange: AmountRange | null
+  amountRange?: AmountRange
 }
 
 export interface OverviewTransactionsResponse {

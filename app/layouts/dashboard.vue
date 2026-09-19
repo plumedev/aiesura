@@ -48,7 +48,7 @@ onMounted(async () => {
       v-model:open="open"
       collapsible
       resizable
-      class="bg-elevated/25"
+      class="bg-[#DCE8E2] dark:bg-elevated/25 border-r border-black/5 dark:border-white/5"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header>

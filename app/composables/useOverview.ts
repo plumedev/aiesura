@@ -19,9 +19,9 @@ export const useOverview = () => {
   // --- Filtres ---
   const filters = reactive<OverviewFilters>({
     search: '',
-    type: null,
+    type: undefined,
     accountIds: [],
-    amountRange: null
+    amountRange: undefined
   })
 
   // --- KPI Summary ---

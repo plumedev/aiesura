@@ -43,7 +43,7 @@ const handleConfirm = () => {
     @update:open="emit('update:open', $event)"
   >
     <template #content>
-      <UCard>
+      <UCard class="!bg-transparent shadow-none">
         <template #header>
           <h3 class="text-lg font-semibold flex items-center gap-2">
             <UIcon

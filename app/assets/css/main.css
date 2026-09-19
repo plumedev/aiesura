@@ -123,7 +123,7 @@ body {
 }
 
 .dark .vod {
-  --vod-primary: #50E8A8 !important;
+  --vod-primary: #0A332C !important;
   --vod-bg: #0C3C32 !important;
   --vod-surface: #0A332C !important;
   --vod-border: rgba(255, 255, 255, 0.1) !important;
@@ -131,7 +131,64 @@ body {
   --vod-text-muted: #9ca3af !important;
 }
 
-/* Personnalisation de la bordure du bouton preset actif */
+.vod__preset-btn:hover {
+  background: #0A332C !important;
+  color: #FFFFFF !important;
+}
+
 .vod__preset-btn--active {
+  background: #0A332C !important;
+  color: #FFFFFF !important;
   border-color: var(--vod-border) !important;
+}
+
+/* ── Thème personnalisé pour UCalendar (Sélecteur de date Reka / Nuxt UI) ── */
+[data-reka-calendar-cell-trigger][data-selected],
+[data-slot="cellTrigger"][data-selected] {
+  background-color: #0A332C !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-reka-calendar-cell-trigger][data-selected],
+.dark [data-slot="cellTrigger"][data-selected] {
+  background-color: #0A332C !important;
+  color: #FFFFFF !important;
+}
+
+[data-reka-calendar-cell-trigger][data-highlighted],
+[data-slot="cellTrigger"][data-highlighted] {
+  background-color: rgba(10, 51, 44, 0.3) !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-reka-calendar-cell-trigger][data-highlighted],
+.dark [data-slot="cellTrigger"][data-highlighted] {
+  background-color: rgba(10, 51, 44, 0.6) !important;
+  color: #FFFFFF !important;
+}
+
+[data-reka-calendar-cell-trigger]:not([data-selected]):hover,
+[data-slot="cellTrigger"]:not([data-selected]):hover,
+[data-reka-calendar-cell-trigger]:focus-visible,
+[data-slot="cellTrigger"]:focus-visible {
+  background-color: #0A332C !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-reka-calendar-cell-trigger]:not([data-selected]):hover,
+.dark [data-slot="cellTrigger"]:not([data-selected]):hover,
+.dark [data-reka-calendar-cell-trigger]:focus-visible,
+.dark [data-slot="cellTrigger"]:focus-visible {
+  background-color: #0A332C !important;
+  color: #FFFFFF !important;
+}
+
+[data-slot="header"] button:hover {
+  background-color: #0A332C !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-slot="header"] button:hover {
+  background-color: #0A332C !important;
+  color: #FFFFFF !important;
 }

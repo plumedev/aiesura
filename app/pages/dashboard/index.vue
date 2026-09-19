@@ -33,13 +33,11 @@ const accountOptions = computed(() =>
 )
 
 const typeFilterOptions = [
-  { label: 'Tous les types', value: null },
   { label: 'Revenus', value: 'income' },
   { label: 'Dépenses', value: 'expense' }
 ]
 
 const amountRangeOptions = [
-  { label: 'Tous les montants', value: null },
   { label: 'Petit (< 50 €)', value: 'small' },
   { label: 'Moyen (50 – 500 €)', value: 'medium' },
   { label: 'Gros (> 500 €)', value: 'large' }
@@ -167,9 +165,9 @@ const hasFilters = computed(() =>
 
 const clearFilters = () => {
   filters.search = ''
-  filters.type = null
+  filters.type = undefined
   filters.accountIds = []
-  filters.amountRange = null
+  filters.amountRange = undefined
 }
 </script>
 
@@ -261,7 +259,7 @@ const clearFilters = () => {
             :items="typeFilterOptions"
             value-key="value"
             label-key="label"
-            placeholder="Type"
+            placeholder="Tous les types"
             class="w-44"
           />
 
@@ -272,7 +270,7 @@ const clearFilters = () => {
             value-key="value"
             label-key="label"
             multiple
-            placeholder="Comptes"
+            placeholder="Tous les comptes"
             class="w-48"
           />
 
@@ -282,7 +280,7 @@ const clearFilters = () => {
             :items="amountRangeOptions"
             value-key="value"
             label-key="label"
-            placeholder="Montant"
+            placeholder="Tous les montants"
             class="w-48"
           />
 

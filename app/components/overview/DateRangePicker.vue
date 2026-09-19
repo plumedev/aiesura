@@ -103,6 +103,7 @@ const selectRange = (range: (typeof ranges)[0]) => {
       readonly
       :model-value="label"
       icon="i-heroicons-calendar-days"
+      placeholder="Sélectionner une période"
       class="font-medium cursor-pointer w-full sm:w-64"
       :ui="{ base: 'cursor-pointer' }"
     />
@@ -115,9 +116,13 @@ const selectRange = (range: (typeof ranges)[0]) => {
             v-for="range in ranges"
             :key="range.label"
             :label="range.label"
-            color="neutral"
-            :variant="isSelected(range) ? 'soft' : 'ghost'"
-            class="rounded-none px-6 justify-start"
+            variant="ghost"
+            :class="[
+              'rounded-none px-6 justify-start font-medium transition-colors cursor-pointer',
+              isSelected(range)
+                ? '!bg-[#0A332C] !text-white'
+                : 'text-gray-700 dark:text-gray-300 hover:!bg-[#0A332C] hover:!text-white dark:hover:!bg-[#0A332C] dark:hover:!text-white'
+            ]"
             @click="selectRange(range)"
           />
         </div>

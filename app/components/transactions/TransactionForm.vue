@@ -19,7 +19,11 @@ const emit = defineEmits(['close', 'success'])
 
 const toast = useToast()
 
-const { data: accounts } = await useFetch('/api/accounts')
+const { data: accounts } = await useFetch<Array<{ id: string, name: string, isMain?: boolean }>>('/api/accounts')
+
+const defaultAccountId = computed(() => {
+  return accounts.value?.find(a => a.isMain)?.id || accounts.value?.[0]?.id || ''
+})
 
 const schema = z.object({
   name: z.string().min(1, 'Le libellé est requis'),
@@ -45,13 +49,19 @@ const updateMode = ref<'all' | 'future' | 'single'>('all')
 const state = reactive({
   name: '',
   amount: undefined as number | undefined,
-  accountId: accounts.value?.[0]?.id || '',
+  accountId: defaultAccountId.value,
   type: 'expense' as 'income' | 'expense',
   frequency: 'once' as 'once' | 'monthly' | 'quarterly' | 'yearly',
   startDate: new Date(),
   hasEndDate: true,
   endDate: new Date() as Date | undefined
 })
+
+watch(defaultAccountId, (newId) => {
+  if (!props.transaction && !state.accountId && newId) {
+    state.accountId = newId
+  }
+}, { immediate: true })
 
 watch(() => props.transaction, (newTx) => {
   if (newTx) {
@@ -66,7 +76,7 @@ watch(() => props.transaction, (newTx) => {
   } else {
     state.name = ''
     state.amount = undefined
-    state.accountId = accounts.value?.[0]?.id || ''
+    state.accountId = defaultAccountId.value
     state.type = 'expense'
     state.frequency = 'once'
     state.startDate = new Date()
