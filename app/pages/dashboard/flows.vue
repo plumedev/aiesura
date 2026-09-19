@@ -46,7 +46,7 @@ const { data: currentChecklist } = await useFetch<MonthlyChecklist | null>(
   { query: { month: selectedMonth }, watch: [selectedMonth] }
 )
 
-const { data: accounts } = await useFetch<{ id: string, name: string }[]>('/api/accounts')
+const { data: accounts } = await useFetch<Array<{ id: string, name: string, isMain?: boolean }>>('/api/accounts')
 
 // ─── Revenus disponibles ──────────────────────────────────────────────────────
 

@@ -4,6 +4,7 @@ import type { TransactionIteration, TransferRule, ChecklistStep } from '~/types'
 interface Account {
   id: string
   name: string
+  isMain?: boolean
 }
 
 type EditableRule = TransferRule | (ChecklistStep & { id?: string })
@@ -42,9 +43,13 @@ const scopeOptions = computed(() => [
   }
 ])
 
+const defaultSourceAccount = computed(() =>
+  props.accounts.find(a => a.isMain)?.id || props.accounts[0]?.id || ''
+)
+
 const form = reactive({
   purposeName: '',
-  sourceAccountId: '',
+  sourceAccountId: defaultSourceAccount.value,
   transitAccountId: 'none' as string | 'none',
   destinationAccountId: '',
   amountType: 'fixed' as 'fixed' | 'recurring',
@@ -94,7 +99,7 @@ const updateTxPercentage = (id: string, percentage: number) => {
 
 const resetForm = () => {
   form.purposeName = ''
-  form.sourceAccountId = props.accounts[0]?.id || ''
+  form.sourceAccountId = defaultSourceAccount.value
   form.transitAccountId = 'none'
   form.destinationAccountId = ''
   form.amountType = 'fixed'
