@@ -70,6 +70,22 @@ const handleEditSuccess = async () => {
   await refreshAll()
 }
 
+// --- Modale de transaction ponctuelle ---
+const isOneTimeModalOpen = ref(false)
+
+const openOneTimeModal = () => {
+  isOneTimeModalOpen.value = true
+}
+
+const closeOneTimeModal = () => {
+  isOneTimeModalOpen.value = false
+}
+
+const handleOneTimeSuccess = async () => {
+  isOneTimeModalOpen.value = false
+  await refreshAll()
+}
+
 const toast = useToast()
 
 const resetIteration = async (id: string) => {
@@ -178,15 +194,26 @@ const clearFilters = () => {
         <UDashboardSidebarCollapse />
       </template>
       <template #right>
-        <UButton
-          :icon="useOwlDatePicker ? 'i-heroicons-calendar' : 'i-heroicons-adjustments-horizontal'"
-          :label="useOwlDatePicker ? 'Sélecteur standard' : 'Sélecteur Slider'"
-          color="neutral"
-          variant="ghost"
-          size="xs"
-          class="rounded-md"
-          @click="toggleDatePicker"
-        />
+        <div class="flex items-center gap-2">
+          <UButton
+            icon="i-heroicons-plus"
+            label="Transaction ponctuelle"
+            color="primary"
+            variant="solid"
+            size="sm"
+            class="cursor-pointer font-medium"
+            @click="openOneTimeModal"
+          />
+          <UButton
+            :icon="useOwlDatePicker ? 'i-heroicons-calendar' : 'i-heroicons-adjustments-horizontal'"
+            :label="useOwlDatePicker ? 'Sélecteur standard' : 'Sélecteur Slider'"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            class="rounded-md"
+            @click="toggleDatePicker"
+          />
+        </div>
       </template>
     </UDashboardNavbar>
 
@@ -514,6 +541,14 @@ const clearFilters = () => {
       :iteration="editingIteration"
       @close="closeEditModal"
       @success="handleEditSuccess"
+    />
+
+    <!-- Modale de transaction ponctuelle -->
+    <OverviewOneTimeTransactionModal
+      v-if="isOneTimeModalOpen"
+      :initial-date="dateRange.start ? new Date(dateRange.start) : undefined"
+      @close="closeOneTimeModal"
+      @success="handleOneTimeSuccess"
     />
   </UDashboardPanel>
 </template>

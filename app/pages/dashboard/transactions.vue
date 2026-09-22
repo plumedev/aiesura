@@ -49,21 +49,32 @@ const filteredTransactions = computed<Transaction[]>(() => {
   })
 })
 
-const totalExpenses = computed(() => {
+// Totaux récurrents mensualisés équivalents (Mensuel: 1x, Trimestriel: /3, Annuel: /12, Once: exclu)
+const monthlyExpenses = computed(() => {
   return filteredTransactions.value
     .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + Number(t.amount), 0)
+    .reduce((sum, t) => {
+      const amt = Number(t.amount)
+      if (t.frequency === 'monthly') return sum + amt
+      if (t.frequency === 'quarterly') return sum + (amt / 3)
+      if (t.frequency === 'yearly') return sum + (amt / 12)
+      return sum
+    }, 0)
 })
 
-const totalIncome = computed(() => {
+const monthlyIncome = computed(() => {
   return filteredTransactions.value
     .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + Number(t.amount), 0)
+    .reduce((sum, t) => {
+      const amt = Number(t.amount)
+      if (t.frequency === 'monthly') return sum + amt
+      if (t.frequency === 'quarterly') return sum + (amt / 3)
+      if (t.frequency === 'yearly') return sum + (amt / 12)
+      return sum
+    }, 0)
 })
 
-const balance = computed(() => {
-  return totalIncome.value - totalExpenses.value
-})
+const monthlyBalance = computed(() => monthlyIncome.value - monthlyExpenses.value)
 
 const toast = useToast()
 const deleteLoading = ref(false)
@@ -169,26 +180,40 @@ const getDropdownItems = (row: unknown) => [
       </template>
       <template #right>
         <div class="flex items-center gap-6 text-sm mr-2 border-r border-gray-200 dark:border-gray-800 pr-6">
-          <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+          <div
+            class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400"
+            title="Dépenses récurrentes mensualisées (mensuel + trimestriel/3 + annuel/12)"
+          >
             <UIcon
               name="i-heroicons-arrow-down-left"
               class="w-4 h-4 text-red-400"
             />
-            Dépenses: <span class="font-semibold text-gray-900 dark:text-white">{{ totalExpenses.toFixed(2) }} €</span>
+            Dépenses : <span class="font-semibold text-gray-900 dark:text-white">{{ monthlyExpenses.toFixed(2) }} €<span class="text-xs font-normal text-gray-400">/mois</span></span>
           </div>
-          <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+          <div
+            class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400"
+            title="Revenus récurrents mensualisés"
+          >
             <UIcon
               name="i-heroicons-arrow-up-right"
               class="w-4 h-4 text-green-500"
             />
-            Revenus: <span class="font-semibold text-gray-900 dark:text-white">{{ totalIncome.toFixed(2) }} €</span>
+            Revenus : <span class="font-semibold text-gray-900 dark:text-white">{{ monthlyIncome.toFixed(2) }} €<span class="text-xs font-normal text-gray-400">/mois</span></span>
           </div>
-          <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+          <div
+            class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400"
+            title="Solde net récurrent mensuel"
+          >
             <UIcon
               name="i-heroicons-arrows-right-left"
               class="w-4 h-4 text-blue-500"
             />
-            Solde: <span class="font-semibold text-gray-900 dark:text-white">{{ balance.toFixed(2) }} €</span>
+            Solde : <span
+              class="font-semibold"
+              :class="monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'"
+            >
+              {{ monthlyBalance >= 0 ? '+' : '' }}{{ monthlyBalance.toFixed(2) }} €<span class="text-xs font-normal text-gray-400">/mois</span>
+            </span>
           </div>
         </div>
 

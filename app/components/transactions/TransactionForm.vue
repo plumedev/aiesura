@@ -51,10 +51,10 @@ const state = reactive({
   amount: undefined as number | undefined,
   accountId: defaultAccountId.value,
   type: 'expense' as 'income' | 'expense',
-  frequency: 'once' as 'once' | 'monthly' | 'quarterly' | 'yearly',
+  frequency: 'monthly' as 'once' | 'monthly' | 'quarterly' | 'yearly',
   startDate: new Date(),
-  hasEndDate: true,
-  endDate: new Date() as Date | undefined
+  hasEndDate: false,
+  endDate: undefined as Date | undefined
 })
 
 watch(defaultAccountId, (newId) => {
@@ -278,7 +278,6 @@ async function submitEdit(mode: 'all' | 'future') {
       <UTabs
         v-model="state.frequency"
         :items="[
-          { label: 'Unique', value: 'once' },
           { label: 'Mensuel', value: 'monthly' },
           { label: 'Trimestriel', value: 'quarterly' },
           { label: 'Annuel', value: 'yearly' }
