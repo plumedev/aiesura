@@ -12,14 +12,17 @@ const navLinks = [
 <template>
   <div class="flex flex-col min-h-screen selection:bg-[#0A332C] selection:text-white">
     <!-- Header de navigation public -->
-    <UHeader class="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#0A332C]/80 border-b border-black/5 dark:border-white/10">
+    <UHeader
+      mode="slideover"
+      class="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#0A332C]/80 border-b border-black/5 dark:border-white/10"
+    >
       <template #left>
         <NuxtLink
           to="/"
           class="flex items-center gap-2.5"
         >
           <AppLogo class="w-auto h-6 shrink-0 text-[#0A332C] dark:text-emerald-400" />
-          <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white hidden sm:inline-block">
+          <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white inline-block">
             Aiesura
           </span>
         </NuxtLink>
@@ -71,6 +74,58 @@ const navLinks = [
               class="font-semibold cursor-pointer"
             />
           </template>
+        </div>
+      </template>
+
+      <!-- Menu mobile (tiroir latéral slideover) -->
+      <template #body>
+        <div class="flex flex-col gap-6 py-4">
+          <nav class="flex flex-col gap-2">
+            <NuxtLink
+              v-for="link in navLinks"
+              :key="link.to"
+              :to="link.to"
+              class="flex items-center px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:text-gray-900 hover:bg-black/5 dark:text-gray-200 dark:hover:text-white dark:hover:bg-white/10 transition-colors"
+            >
+              {{ link.label }}
+            </NuxtLink>
+          </nav>
+
+          <div class="border-t border-black/10 dark:border-white/10 pt-4 flex flex-col gap-3">
+            <template v-if="user">
+              <UButton
+                to="/dashboard"
+                icon="i-lucide-layout-dashboard"
+                label="Accéder au Dashboard"
+                color="primary"
+                variant="solid"
+                size="md"
+                block
+                class="font-medium justify-center"
+              />
+            </template>
+            <template v-else>
+              <UButton
+                to="/login"
+                label="Se connecter"
+                color="neutral"
+                variant="outline"
+                size="md"
+                block
+                class="font-medium justify-center"
+              />
+              <UButton
+                to="/register"
+                label="Créer un compte"
+                trailing-icon="i-lucide-arrow-right"
+                color="primary"
+                variant="solid"
+                size="md"
+                block
+                class="font-semibold justify-center"
+              />
+            </template>
+          </div>
         </div>
       </template>
     </UHeader>

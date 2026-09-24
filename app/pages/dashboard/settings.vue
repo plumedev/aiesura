@@ -47,7 +47,7 @@ const handleForceOnboarding = async () => {
     </template>
 
     <template #body>
-      <div class="p-6 md:p-8 max-w-4xl mx-auto w-full space-y-6">
+      <div class="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto w-full space-y-6">
         <div>
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">
             Préférences de l'application

@@ -54,9 +54,12 @@ onMounted(async () => {
       <template #header>
         <NuxtLink
           to="/"
-          class="flex items-center gap-2 py-1"
+          class="flex items-center gap-2.5 py-1"
         >
-          <AppLogo class="w-auto h-6 shrink-0" />
+          <AppLogo class="w-auto h-6 shrink-0 text-[#0A332C] dark:text-emerald-400" />
+          <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white inline-block">
+            Aiesura
+          </span>
         </NuxtLink>
       </template>
 

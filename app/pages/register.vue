@@ -29,7 +29,7 @@ const register = async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
     <UCard class="w-full max-w-sm">
       <template #header>
         <h2 class="text-xl font-semibold text-center">

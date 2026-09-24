@@ -179,7 +179,7 @@ const getDropdownItems = (row: unknown) => [
         <UDashboardSidebarCollapse />
       </template>
       <template #right>
-        <div class="flex items-center gap-6 text-sm mr-2 border-r border-gray-200 dark:border-gray-800 pr-6">
+        <div class="hidden lg:flex items-center gap-6 text-sm mr-2 border-r border-gray-200 dark:border-gray-800 pr-6">
           <div
             class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400"
             title="Dépenses récurrentes mensualisées (mensuel + trimestriel/3 + annuel/12)"
@@ -222,30 +222,52 @@ const getDropdownItems = (row: unknown) => [
           color="primary"
           @click="openModal"
         >
-          Ajouter une transaction
+          <span class="hidden sm:inline">Ajouter une transaction</span>
+          <span class="sm:hidden">Ajouter</span>
         </UButton>
       </template>
     </UDashboardNavbar>
 
     <div class="flex flex-col gap-4 p-4 h-full overflow-hidden">
+      <!-- Mini summary cards sur mobile (< lg) -->
+      <div class="grid grid-cols-3 gap-2 lg:hidden">
+        <div class="p-2 sm:p-2.5 rounded-lg bg-[#F1F5F3] dark:bg-[#0C3C32] border border-black/5 dark:border-white/5 flex flex-col justify-between">
+          <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate">Dépenses</span>
+          <span class="text-[11px] sm:text-xs font-bold text-red-500 dark:text-red-400 truncate">{{ monthlyExpenses.toFixed(2) }} €</span>
+        </div>
+        <div class="p-2 sm:p-2.5 rounded-lg bg-[#F1F5F3] dark:bg-[#0C3C32] border border-black/5 dark:border-white/5 flex flex-col justify-between">
+          <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate">Revenus</span>
+          <span class="text-[11px] sm:text-xs font-bold text-green-600 dark:text-green-400 truncate">{{ monthlyIncome.toFixed(2) }} €</span>
+        </div>
+        <div class="p-2 sm:p-2.5 rounded-lg bg-[#F1F5F3] dark:bg-[#0C3C32] border border-black/5 dark:border-white/5 flex flex-col justify-between">
+          <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate">Solde</span>
+          <span
+            class="text-[11px] sm:text-xs font-bold truncate"
+            :class="monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'"
+          >
+            {{ monthlyBalance >= 0 ? '+' : '' }}{{ monthlyBalance.toFixed(2) }} €
+          </span>
+        </div>
+      </div>
+
       <UCard>
         <UInput
           v-model="search"
           icon="i-heroicons-magnifying-glass"
           placeholder="Rechercher une transaction..."
-          class="w-72 max-w-full"
+          class="w-full sm:w-72"
         />
       </UCard>
 
       <UCard
         class="flex-1 flex flex-col min-h-0"
-        :ui="{ body: 'flex-1 overflow-hidden flex flex-col p-0 sm:p-0' }"
+        :ui="{ body: 'flex-1 overflow-x-auto flex flex-col p-0 sm:p-0' }"
       >
         <UTable
           v-model:sorting="sorting"
           :data="filteredTransactions"
           :columns="columns"
-          class="flex-1 overflow-auto"
+          class="flex-1 min-w-[580px]"
           sticky
           :ui="{ thead: 'bg-gray-50/90 dark:bg-[#11463B]/90 backdrop-blur-md' }"
         >

@@ -312,15 +312,28 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col md:flex-row h-screen overflow-hidden bg-gray-50 dark:bg-[#0A332C] font-sans">
-    <!-- Colonne gauche : Stepper et Pédagogie (Clic navigable) -->
-    <div class="md:w-2/5 lg:w-1/3 bg-radial from-[#155A4C] to-[#0C3C32] text-white p-8 md:p-12 flex flex-col justify-between shadow-2xl z-10 h-full overflow-y-auto">
-      <div class="space-y-12">
-        <div class="flex items-center gap-2">
-          <AppLogo class="h-8 w-auto filter invert brightness-0" />
+  <div class="flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden bg-gray-50 dark:bg-[#0A332C] font-sans">
+    <!-- Colonne gauche : Stepper et Pédagogie (Compact sur mobile, barre complète sur desktop) -->
+    <div class="w-full md:w-2/5 lg:w-1/3 bg-radial from-[#155A4C] to-[#0C3C32] text-white p-4 sm:p-6 md:p-12 flex flex-col justify-between shadow-2xl z-10 shrink-0 md:h-full md:overflow-y-auto">
+      <div class="space-y-4 md:space-y-12">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <AppLogo class="h-6 md:h-8 w-auto filter invert brightness-0" />
+            <span class="font-bold text-base md:text-lg text-white">Aiesura</span>
+          </div>
+          <div class="flex items-center gap-2 md:hidden">
+            <button
+              type="button"
+              class="text-xs text-red-300 underline font-medium cursor-pointer"
+              @click="handleSkip"
+            >
+              Passer
+            </button>
+            <UColorModeButton class="text-white hover:bg-white/10" />
+          </div>
         </div>
 
-        <div>
+        <div class="hidden md:block">
           <h1 class="text-3xl font-extrabold tracking-tight">
             Onboarding
           </h1>
@@ -329,80 +342,82 @@ onMounted(async () => {
           </p>
         </div>
 
-        <!-- Stepper Visuel Interactif -->
-        <nav class="relative space-y-6">
-          <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-emerald-800/40 z-0" />
+        <!-- Stepper Visuel : Horizontal sur mobile, Vertical sur desktop -->
+        <nav class="relative">
+          <div class="hidden md:block absolute left-4 top-2 bottom-2 w-0.5 bg-emerald-800/40 z-0" />
 
-          <!-- Étape 1 -->
-          <div
-            class="flex items-start gap-4 relative z-10 transition-all duration-300 cursor-pointer hover:bg-white/5 p-2 rounded-lg -ml-2"
-            :class="currentStep === 1 ? 'scale-105' : 'opacity-60'"
-            @click="goToStep(1)"
-          >
+          <div class="flex flex-row md:flex-col justify-between md:justify-start gap-2 md:space-y-6">
+            <!-- Étape 1 -->
             <div
-              class="w-9 h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
-              :class="currentStep >= 1 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
+              class="flex items-center md:items-start gap-2 md:gap-4 relative z-10 transition-all duration-300 cursor-pointer hover:bg-white/5 p-1.5 md:p-2 rounded-lg"
+              :class="currentStep === 1 ? 'scale-105' : 'opacity-60'"
+              @click="goToStep(1)"
             >
-              1
+              <div
+                class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-xs md:text-sm border-2 transition-colors duration-300"
+                :class="currentStep >= 1 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
+              >
+                1
+              </div>
+              <div class="hidden sm:block">
+                <p class="font-bold text-xs md:text-sm">
+                  Comptes
+                </p>
+                <p class="hidden md:block text-xs text-emerald-200 mt-0.5">
+                  Ajoutez vos comptes d'épargne ou courants.
+                </p>
+              </div>
             </div>
-            <div>
-              <p class="font-bold text-sm">
-                Comptes bancaires
-              </p>
-              <p class="text-xs text-emerald-200 mt-0.5">
-                Ajoutez vos comptes d'épargne ou courants.
-              </p>
-            </div>
-          </div>
 
-          <!-- Étape 2 -->
-          <div
-            class="flex items-start gap-4 relative z-10 transition-all duration-300 cursor-pointer hover:bg-white/5 p-2 rounded-lg -ml-2"
-            :class="currentStep === 2 ? 'scale-105' : 'opacity-60'"
-            @click="goToStep(2)"
-          >
+            <!-- Étape 2 -->
             <div
-              class="w-9 h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
-              :class="currentStep >= 2 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
+              class="flex items-center md:items-start gap-2 md:gap-4 relative z-10 transition-all duration-300 cursor-pointer hover:bg-white/5 p-1.5 md:p-2 rounded-lg"
+              :class="currentStep === 2 ? 'scale-105' : 'opacity-60'"
+              @click="goToStep(2)"
             >
-              2
+              <div
+                class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-xs md:text-sm border-2 transition-colors duration-300"
+                :class="currentStep >= 2 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
+              >
+                2
+              </div>
+              <div class="hidden sm:block">
+                <p class="font-bold text-xs md:text-sm">
+                  Revenus
+                </p>
+                <p class="hidden md:block text-xs text-emerald-200 mt-0.5">
+                  Saisissez vos salaires ou autres rentrées.
+                </p>
+              </div>
             </div>
-            <div>
-              <p class="font-bold text-sm">
-                Revenus récurrents
-              </p>
-              <p class="text-xs text-emerald-200 mt-0.5">
-                Saisissez vos salaires ou autres rentrées.
-              </p>
-            </div>
-          </div>
 
-          <!-- Étape 3 -->
-          <div
-            class="flex items-start gap-4 relative z-10 transition-all duration-300 cursor-pointer hover:bg-white/5 p-2 rounded-lg -ml-2"
-            :class="currentStep === 3 ? 'scale-105' : 'opacity-60'"
-            @click="goToStep(3)"
-          >
+            <!-- Étape 3 -->
             <div
-              class="w-9 h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300"
-              :class="currentStep >= 3 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
+              class="flex items-center md:items-start gap-2 md:gap-4 relative z-10 transition-all duration-300 cursor-pointer hover:bg-white/5 p-1.5 md:p-2 rounded-lg"
+              :class="currentStep === 3 ? 'scale-105' : 'opacity-60'"
+              @click="goToStep(3)"
             >
-              3
-            </div>
-            <div>
-              <p class="font-bold text-sm">
-                Dépenses habituelles
-              </p>
-              <p class="text-xs text-emerald-200 mt-0.5">
-                Loyer, abonnements, factures courantes.
-              </p>
+              <div
+                class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full shrink-0 aspect-square flex items-center justify-center font-bold text-xs md:text-sm border-2 transition-colors duration-300"
+                :class="currentStep >= 3 ? 'bg-white text-[#0C3C32] border-white' : 'bg-emerald-900 border-emerald-700 text-emerald-300'"
+              >
+                3
+              </div>
+              <div class="hidden sm:block">
+                <p class="font-bold text-xs md:text-sm">
+                  Dépenses
+                </p>
+                <p class="hidden md:block text-xs text-emerald-200 mt-0.5">
+                  Loyer, abonnements, factures courantes.
+                </p>
+              </div>
             </div>
           </div>
         </nav>
       </div>
 
-      <!-- Bouton Passer l'onboarding (Intégré dans le texte d'explication) -->
-      <div class="mt-8 md:mt-0 flex flex-col gap-3 border-t border-emerald-800/40 pt-4">
+      <!-- Desktop Footer -->
+      <div class="hidden md:flex mt-8 md:mt-0 flex-col gap-3 border-t border-emerald-800/40 pt-4">
         <p class="text-[11px] text-emerald-200/80 leading-relaxed">
           <button
             type="button"
@@ -421,8 +436,8 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Colonne droite : Formulaires interactifs (Non-scrollable globalement, listes scrollables) -->
-    <div class="flex-1 p-6 md:p-8 lg:p-10 flex flex-col justify-between max-w-4xl mx-auto w-full h-full overflow-hidden">
+    <!-- Colonne droite : Formulaires interactifs -->
+    <div class="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-between max-w-4xl mx-auto w-full md:h-full overflow-y-auto">
       <div class="space-y-4 flex-grow flex flex-col justify-start overflow-hidden">
         <!-- HEADER DE L'ÉTAPE COURANTE -->
         <div class="space-y-1.5 flex-shrink-0">
@@ -894,29 +909,39 @@ onMounted(async () => {
           </div>
 
           <!-- BOUTONS DE NAVIGATION DU BAS -->
-          <div class="border-t border-gray-200 dark:border-gray-800 pt-4 mt-3 flex justify-between items-center bg-gray-50 dark:bg-[#0A332C] flex-shrink-0">
+          <div class="border-t border-gray-200 dark:border-gray-800 pt-4 mt-3 flex justify-between items-center gap-2 bg-gray-50 dark:bg-[#0A332C] flex-shrink-0">
             <UButton
               v-if="currentStep > 1"
               color="primary"
               variant="outline"
-              size="lg"
+              size="md"
               icon="i-heroicons-arrow-left"
-              label="Étape précédente"
               class="cursor-pointer text-[#0A332C] border-[#0A332C] hover:bg-[#0A332C]/10 dark:text-[#50E8A8] dark:border-[#50E8A8] dark:hover:bg-[#50E8A8]/10"
               @click="goToPrevStep"
-            />
+            >
+              <span class="hidden sm:inline">Étape précédente</span>
+              <span class="sm:hidden">Précédent</span>
+            </UButton>
             <div v-else />
 
             <!-- Bouton Étape suivante / Terminer -->
             <UButton
               color="primary"
               variant="solid"
-              size="lg"
+              size="md"
               :trailing-icon="currentStep < 3 ? 'i-heroicons-arrow-right' : 'i-heroicons-check'"
-              :label="currentStep < 3 ? 'Étape suivante' : 'Terminer et voir les Flux Mensuels'"
-              class="cursor-pointer"
+              class="cursor-pointer font-medium"
               @click="goToNextStep"
-            />
+            >
+              <template v-if="currentStep < 3">
+                <span class="hidden sm:inline">Étape suivante</span>
+                <span class="sm:hidden">Suivant</span>
+              </template>
+              <template v-else>
+                <span class="hidden sm:inline">Terminer et voir les Flux Mensuels</span>
+                <span class="sm:hidden">Terminer</span>
+              </template>
+            </UButton>
           </div>
         </div>
       </div>

@@ -214,7 +214,7 @@ async function submitEdit(mode: 'all' | 'future') {
     class="space-y-4"
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <UFormField
         label="Nom de la transaction"
         name="name"
@@ -240,7 +240,7 @@ async function submitEdit(mode: 'all' | 'future') {
       </UFormField>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <UFormField
         label="Compte"
         name="accountId"
@@ -287,7 +287,7 @@ async function submitEdit(mode: 'all' | 'future') {
       />
     </UFormField>
 
-    <div class="flex justify-between items-start">
+    <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
       <UFormField
         :label="state.hasEndDate ? 'Période' : 'Date'"
         name="date"

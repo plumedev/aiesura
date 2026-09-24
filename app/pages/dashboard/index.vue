@@ -197,43 +197,49 @@ const clearFilters = () => {
         <div class="flex items-center gap-2">
           <UButton
             icon="i-heroicons-plus"
-            label="Transaction ponctuelle"
             color="primary"
             variant="solid"
             size="sm"
             class="cursor-pointer font-medium"
             @click="openOneTimeModal"
-          />
+          >
+            <span class="hidden sm:inline">Transaction ponctuelle</span>
+            <span class="sm:hidden">Ajouter</span>
+          </UButton>
           <UButton
             :icon="useOwlDatePicker ? 'i-heroicons-calendar' : 'i-heroicons-adjustments-horizontal'"
-            :label="useOwlDatePicker ? 'Sélecteur standard' : 'Sélecteur Slider'"
+            :title="useOwlDatePicker ? 'Passer au sélecteur Slider' : 'Passer au sélecteur standard'"
             color="neutral"
             variant="ghost"
             size="xs"
             class="rounded-md"
             @click="toggleDatePicker"
-          />
+          >
+            <span class="hidden md:inline">{{ useOwlDatePicker ? 'Sélecteur standard' : 'Sélecteur Slider' }}</span>
+          </UButton>
         </div>
       </template>
     </UDashboardNavbar>
 
     <div class="flex flex-col gap-6 p-4 h-full overflow-y-auto lg:overflow-hidden">
       <!-- ── Sélecteur de période ── -->
-      <div class="flex items-center">
-        <p class="text-sm mr-2 text-gray-500 dark:text-gray-400">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+        <p class="text-sm mr-2 text-gray-500 dark:text-gray-400 shrink-0">
           Période analysée
         </p>
-        <ClientOnly>
-          <OwlDatePicker
-            v-if="useOwlDatePicker"
-            v-model="dateRange"
-          />
-          <OverviewDateRangePicker
-            v-else
-            :model-value="dateRange"
-            @update:model-value="dateRange = $event"
-          />
-        </ClientOnly>
+        <div class="overflow-x-auto max-w-full">
+          <ClientOnly>
+            <OwlDatePicker
+              v-if="useOwlDatePicker"
+              v-model="dateRange"
+            />
+            <OverviewDateRangePicker
+              v-else
+              :model-value="dateRange"
+              @update:model-value="dateRange = $event"
+            />
+          </ClientOnly>
+        </div>
       </div>
 
       <!-- ── KPI Cards ── -->
@@ -241,27 +247,32 @@ const clearFilters = () => {
         <div
           v-for="kpi in kpiCards"
           :key="kpi.label"
-          class="p-4 sm:p-6 flex flex-col gap-3"
+          class="p-3.5 sm:p-6 flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-start gap-3"
         >
-          <!-- Icon Badge -->
-          <div :class="['w-8 h-8 rounded-full flex items-center justify-center border', kpi.badgeClass]">
-            <UIcon
-              :name="kpi.icon"
-              :class="['w-4 h-4', kpi.iconClass]"
-            />
+          <div class="flex items-center sm:items-start gap-2.5 sm:gap-3">
+            <!-- Icon Badge -->
+            <div :class="['w-8 h-8 rounded-full flex items-center justify-center border shrink-0', kpi.badgeClass]">
+              <UIcon
+                :name="kpi.icon"
+                :class="['w-4 h-4', kpi.iconClass]"
+              />
+            </div>
+
+            <div class="flex flex-col gap-0.5">
+              <p class="text-[11px] font-semibold tracking-wider uppercase text-gray-500 dark:text-gray-400">
+                {{ kpi.label }}
+              </p>
+            </div>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <p class="text-[11px] font-semibold tracking-wider uppercase text-gray-500 dark:text-gray-400">
-              {{ kpi.label }}
-            </p>
+          <div>
             <p
               v-if="summaryPending"
-              class="h-8 w-32 bg-gray-200 dark:bg-gray-800 rounded animate-pulse mt-1"
+              class="h-7 w-24 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"
             />
             <p
               v-else
-              class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight"
+              class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight"
             >
               {{ kpi.value }}
             </p>
@@ -271,13 +282,13 @@ const clearFilters = () => {
 
       <!-- ── Filtres ── -->
       <UCard>
-        <div class="flex flex-wrap gap-3 items-center">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center">
           <!-- Recherche -->
           <UInput
             v-model="filters.search"
             icon="i-heroicons-magnifying-glass"
             placeholder="Rechercher une transaction..."
-            class="w-60"
+            class="w-full sm:w-60"
           />
 
           <!-- Type -->
@@ -287,7 +298,7 @@ const clearFilters = () => {
             value-key="value"
             label-key="label"
             placeholder="Tous les types"
-            class="w-44"
+            class="w-full sm:w-44"
           />
 
           <!-- Comptes (multiselect) -->
@@ -298,7 +309,7 @@ const clearFilters = () => {
             label-key="label"
             multiple
             placeholder="Tous les comptes"
-            class="w-48"
+            class="w-full sm:w-48"
           />
 
           <!-- Montant -->
@@ -308,7 +319,7 @@ const clearFilters = () => {
             value-key="value"
             label-key="label"
             placeholder="Tous les montants"
-            class="w-48"
+            class="w-full sm:w-48"
           />
 
           <!-- Réinitialiser -->
@@ -355,8 +366,11 @@ const clearFilters = () => {
           <p>Aucune transaction sur cette période.</p>
         </div>
 
-        <div v-else>
-          <table class="w-full text-sm">
+        <div
+          v-else
+          class="overflow-x-auto w-full"
+        >
+          <table class="w-full text-sm min-w-[620px]">
             <thead>
               <tr class="sticky top-0 z-10 backdrop-blur-md bg-gray-50/90 dark:bg-[#11463B]/90 border-b border-default text-left text-gray-900 dark:text-white">
                 <th class="pl-6 pr-4 py-3 font-semibold">

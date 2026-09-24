@@ -206,12 +206,13 @@ const navItems = [
                   :key="item.id"
                   type="button"
                   :class="[
-                    'px-2 py-1 rounded text-xs font-medium cursor-pointer',
+                    'px-2 py-1 rounded text-xs font-medium cursor-pointer shrink-0',
                     activeView === item.id ? 'bg-[#0A332C] text-white' : 'text-gray-700 dark:text-gray-300'
                   ]"
                   @click="setActiveView(item.id)"
                 >
-                  {{ item.label }}
+                  <span class="sm:hidden">{{ item.id === 'overview' ? 'Aperçu' : item.id === 'flows' ? 'Flux' : 'Comptes' }}</span>
+                  <span class="hidden sm:inline">{{ item.label }}</span>
                 </button>
               </div>
 
@@ -220,8 +221,8 @@ const navItems = [
               </h2>
             </div>
 
-            <div class="flex items-center gap-2">
-              <span class="text-xs px-2.5 py-1 rounded-md bg-[#F1F5F3] dark:bg-[#0C3C32] text-gray-700 dark:text-gray-200 font-medium border border-black/5 dark:border-white/5">
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-xs px-2 sm:px-2.5 py-1 rounded-md bg-[#F1F5F3] dark:bg-[#0C3C32] text-gray-700 dark:text-gray-200 font-medium border border-black/5 dark:border-white/5 whitespace-nowrap">
                 📅 Octobre 2026
               </span>
             </div>
@@ -271,7 +272,7 @@ const navItems = [
                   icon="i-heroicons-magnifying-glass"
                   placeholder="Rechercher une transaction..."
                   size="sm"
-                  class="w-48 sm:w-60"
+                  class="w-full sm:w-60"
                 />
                 <span class="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">
                   {{ filteredTransactions.length }} transactions trouvées
@@ -279,8 +280,8 @@ const navItems = [
               </div>
 
               <!-- ── Tableau des transactions avec sous-lignes d'itérations ── -->
-              <div class="rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] shadow-sm">
-                <table class="w-full text-xs sm:text-sm">
+              <div class="rounded-xl overflow-x-auto border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] shadow-sm">
+                <table class="w-full text-xs sm:text-sm min-w-[500px]">
                   <thead>
                     <tr class="sticky top-0 z-10 backdrop-blur-md bg-gray-50/90 dark:bg-[#11463B]/90 border-b border-default text-left text-gray-900 dark:text-white font-semibold">
                       <th class="pl-6 pr-4 py-3">

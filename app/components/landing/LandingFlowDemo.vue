@@ -88,7 +88,7 @@ const dynamicRules = computed<TransferRule[]>(() => {
 </script>
 
 <template>
-  <div class="rounded-2xl border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] p-6 sm:p-8 shadow-xl space-y-6">
+  <div class="rounded-2xl border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] p-4 sm:p-8 shadow-xl space-y-6">
     <!-- En-tête de section -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-4 border-b border-black/5 dark:border-white/10">
       <div>
@@ -108,7 +108,7 @@ const dynamicRules = computed<TransferRule[]>(() => {
       </div>
 
       <!-- Contrôleur de salaire interactif -->
-      <div class="flex flex-col gap-2 min-w-[280px] p-3 rounded-xl bg-white dark:bg-[#0A332C] border border-black/5 dark:border-white/10">
+      <div class="flex flex-col gap-2 w-full lg:w-auto lg:min-w-[280px] p-3 rounded-xl bg-white dark:bg-[#0A332C] border border-black/5 dark:border-white/10">
         <div class="flex justify-between text-xs font-semibold">
           <span class="text-gray-500 dark:text-gray-400">Revenu mensuel simulé</span>
           <span class="text-gray-900 dark:text-white font-bold tabular-nums">{{ formatAmount(salary) }}</span>
@@ -127,21 +127,21 @@ const dynamicRules = computed<TransferRule[]>(() => {
         <div class="flex justify-between gap-2 pt-1">
           <button
             type="button"
-            class="text-[11px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 text-gray-700 dark:text-gray-300 font-medium cursor-pointer"
+            class="flex-1 text-center text-xs py-1.5 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 text-gray-700 dark:text-gray-300 font-medium cursor-pointer"
             @click="setSalary(2400)"
           >
             2 400 €
           </button>
           <button
             type="button"
-            class="text-[11px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 text-gray-700 dark:text-gray-300 font-medium cursor-pointer"
+            class="flex-1 text-center text-xs py-1.5 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 text-gray-700 dark:text-gray-300 font-medium cursor-pointer"
             @click="setSalary(3200)"
           >
             3 200 €
           </button>
           <button
             type="button"
-            class="text-[11px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 text-gray-700 dark:text-gray-300 font-medium cursor-pointer"
+            class="flex-1 text-center text-xs py-1.5 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 text-gray-700 dark:text-gray-300 font-medium cursor-pointer"
             @click="setSalary(4500)"
           >
             4 500 €

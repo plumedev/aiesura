@@ -75,7 +75,7 @@ const completeAll = () => {
 </script>
 
 <template>
-  <div class="rounded-2xl border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] p-6 sm:p-8 shadow-xl space-y-6">
+  <div class="rounded-2xl border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] p-4 sm:p-8 shadow-xl space-y-6">
     <!-- En-tête explicatif fidèle -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/5 dark:border-white/10">
       <div>

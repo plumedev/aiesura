@@ -215,16 +215,18 @@ const items = (row: Row<AccountItem> | AccountItem) => {
 
       <template #right>
         <div class="flex items-center gap-3">
-          <div class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+          <div class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">
             {{ (accounts || []).length }} compte{{ (accounts || []).length > 1 ? 's' : '' }}
           </div>
           <UButton
             icon="i-heroicons-plus"
-            label="Nouveau compte"
             color="primary"
             class="cursor-pointer"
             @click="openCreateModal"
-          />
+          >
+            <span class="hidden sm:inline">Nouveau compte</span>
+            <span class="sm:hidden">Nouveau</span>
+          </UButton>
         </div>
       </template>
     </UDashboardNavbar>
@@ -242,87 +244,89 @@ const items = (row: Row<AccountItem> | AccountItem) => {
       </UCard>
 
       <UCard class="overflow-hidden">
-        <UTable
-          :columns="columns"
-          :data="filteredAccounts"
-          class="w-full"
-        >
-          <template #name-cell="{ row }">
-            <div class="flex items-center gap-3 py-1">
-              <div class="w-9 h-9 rounded-lg bg-[#0A332C]/10 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
-                <UIcon
-                  :name="getRow(row).icon || 'i-heroicons-building-library'"
-                  class="w-5 h-5 text-[#0A332C] dark:text-[#50E8A8]"
-                />
+        <div class="overflow-x-auto w-full">
+          <UTable
+            :columns="columns"
+            :data="filteredAccounts"
+            class="w-full"
+          >
+            <template #name-cell="{ row }">
+              <div class="flex items-center gap-3 py-1">
+                <div class="w-9 h-9 rounded-lg bg-[#0A332C]/10 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <UIcon
+                    :name="getRow(row).icon || 'i-heroicons-building-library'"
+                    class="w-5 h-5 text-[#0A332C] dark:text-[#50E8A8]"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-semibold text-gray-900 dark:text-white">{{ getRow(row).name }}</span>
+                  <span
+                    v-if="getRow(row).isMain"
+                    class="text-xs text-gray-500 dark:text-gray-400 sm:hidden"
+                  >Compte principal</span>
+                </div>
               </div>
-              <div class="flex flex-col">
-                <span class="font-semibold text-gray-900 dark:text-white">{{ getRow(row).name }}</span>
-                <span
+            </template>
+
+            <template #isMain-cell="{ row }">
+              <div class="hidden sm:flex items-center">
+                <UBadge
                   v-if="getRow(row).isMain"
-                  class="text-xs text-gray-500 dark:text-gray-400 sm:hidden"
-                >Compte principal</span>
+                  color="primary"
+                  variant="subtle"
+                  icon="i-heroicons-star"
+                  size="sm"
+                >
+                  Principal
+                </UBadge>
+                <span
+                  v-else
+                  class="text-xs text-gray-400 dark:text-gray-500"
+                >—</span>
               </div>
-            </div>
-          </template>
+            </template>
 
-          <template #isMain-cell="{ row }">
-            <div class="hidden sm:flex items-center">
-              <UBadge
-                v-if="getRow(row).isMain"
-                color="primary"
-                variant="subtle"
-                icon="i-heroicons-star"
-                size="sm"
-              >
-                Principal
-              </UBadge>
-              <span
-                v-else
-                class="text-xs text-gray-400 dark:text-gray-500"
-              >—</span>
-            </div>
-          </template>
+            <template #actions-cell="{ row }">
+              <div class="flex justify-end">
+                <UDropdownMenu
+                  :items="items(row)"
+                  :content="{ side: 'left', align: 'start' }"
+                >
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-heroicons-ellipsis-horizontal-20-solid"
+                    class="cursor-pointer"
+                  />
+                </UDropdownMenu>
+              </div>
+            </template>
 
-          <template #actions-cell="{ row }">
-            <div class="flex justify-end">
-              <UDropdownMenu
-                :items="items(row)"
-                :content="{ side: 'left', align: 'start' }"
-              >
+            <template #empty>
+              <div class="flex flex-col items-center justify-center py-12 text-center">
+                <div class="w-12 h-12 rounded-full bg-[#0A332C]/10 dark:bg-white/10 flex items-center justify-center mb-3">
+                  <UIcon
+                    name="i-heroicons-building-library"
+                    class="w-6 h-6 text-[#0A332C] dark:text-[#50E8A8]"
+                  />
+                </div>
+                <p class="font-medium text-gray-900 dark:text-white text-base mb-1">
+                  Aucun compte trouvé
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-4">
+                  {{ search ? 'Aucun résultat ne correspond à votre recherche.' : 'Commencez par ajouter votre premier compte bancaire.' }}
+                </p>
                 <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-ellipsis-horizontal-20-solid"
-                  class="cursor-pointer"
-                />
-              </UDropdownMenu>
-            </div>
-          </template>
-
-          <template #empty>
-            <div class="flex flex-col items-center justify-center py-12 text-center">
-              <div class="w-12 h-12 rounded-full bg-[#0A332C]/10 dark:bg-white/10 flex items-center justify-center mb-3">
-                <UIcon
-                  name="i-heroicons-building-library"
-                  class="w-6 h-6 text-[#0A332C] dark:text-[#50E8A8]"
+                  v-if="!search"
+                  icon="i-heroicons-plus"
+                  label="Ajouter un compte"
+                  color="primary"
+                  @click="openCreateModal"
                 />
               </div>
-              <p class="font-medium text-gray-900 dark:text-white text-base mb-1">
-                Aucun compte trouvé
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-4">
-                {{ search ? 'Aucun résultat ne correspond à votre recherche.' : 'Commencez par ajouter votre premier compte bancaire.' }}
-              </p>
-              <UButton
-                v-if="!search"
-                icon="i-heroicons-plus"
-                label="Ajouter un compte"
-                color="primary"
-                @click="openCreateModal"
-              />
-            </div>
-          </template>
-        </UTable>
+            </template>
+          </UTable>
+        </div>
       </UCard>
 
       <!-- Modal Création -->

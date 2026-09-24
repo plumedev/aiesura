@@ -333,18 +333,20 @@ const onRuleDeleted = async () => {
         </template>
         <template #right>
           <UButton
-            label="Créer une règle"
             icon="i-heroicons-plus"
             color="primary"
             class="text-xs"
             @click="openCreateModal"
-          />
+          >
+            <span class="hidden sm:inline">Créer une règle</span>
+            <span class="sm:hidden">Créer</span>
+          </UButton>
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <div class="p-6 space-y-6 overflow-auto h-full min-h-0 font-sans w-full bg-transparent">
+      <div class="p-4 sm:p-6 space-y-6 overflow-auto h-full min-h-0 font-sans w-full bg-transparent">
         <!-- Top bar: Date Selector & Income Selection -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Column 1: Period Selection & Action/Progress -->

@@ -95,6 +95,9 @@ const selectRange = (range: (typeof ranges)[0]) => {
     end: toNativeDate(range.end, true)
   })
 }
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value > 0 && width.value < 640)
 </script>
 
 <template>
@@ -109,16 +112,17 @@ const selectRange = (range: (typeof ranges)[0]) => {
     />
 
     <template #content>
-      <div class="flex items-start sm:divide-x divide-default">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-start divide-y sm:divide-y-0 sm:divide-x divide-default max-w-[95vw] sm:max-w-none">
         <!-- Raccourcis -->
-        <div class="flex flex-col py-4">
+        <div class="flex flex-row sm:flex-col overflow-x-auto py-2 sm:py-4 px-2 sm:px-0 divide-x sm:divide-x-0 divide-default shrink-0">
           <UButton
             v-for="range in ranges"
             :key="range.label"
             :label="range.label"
             variant="ghost"
+            size="xs"
             :class="[
-              'rounded-none px-6 justify-start font-medium transition-colors cursor-pointer',
+              'rounded-md sm:rounded-none px-3 sm:px-6 py-1.5 sm:py-2 justify-start font-medium transition-colors cursor-pointer shrink-0 text-xs sm:text-sm',
               isSelected(range)
                 ? '!bg-[#0A332C] !text-white'
                 : 'text-gray-700 dark:text-gray-300 hover:!bg-[#0A332C] hover:!text-white dark:hover:!bg-[#0A332C] dark:hover:!text-white'
@@ -128,13 +132,15 @@ const selectRange = (range: (typeof ranges)[0]) => {
         </div>
 
         <!-- Calendrier -->
-        <UCalendar
-          :model-value="calValue"
-          range
-          :number-of-months="2"
-          class="p-4"
-          @update:model-value="onCalendarChange"
-        />
+        <div class="overflow-x-auto">
+          <UCalendar
+            :model-value="calValue"
+            range
+            :number-of-months="isMobile ? 1 : 2"
+            class="p-2 sm:p-4"
+            @update:model-value="onCalendarChange"
+          />
+        </div>
       </div>
     </template>
   </UPopover>

@@ -70,7 +70,7 @@ const saveIteration = () => {
 </script>
 
 <template>
-  <div class="rounded-2xl border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] p-6 sm:p-8 shadow-xl space-y-6">
+  <div class="rounded-2xl border border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] p-4 sm:p-8 shadow-xl space-y-6">
     <!-- En-tête explicatif fidèle -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/5 dark:border-white/10">
       <div>
@@ -152,8 +152,8 @@ const saveIteration = () => {
     </div>
 
     <!-- ── Tableau des transactions avec sous-lignes (Exactement comme dashboard/index.vue) ── -->
-    <div class="rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-[#0A332C] shadow-sm">
-      <table class="w-full text-xs sm:text-sm">
+    <div class="rounded-xl overflow-x-auto border border-black/10 dark:border-white/10 bg-white dark:bg-[#0A332C] shadow-sm">
+      <table class="w-full text-xs sm:text-sm min-w-[550px]">
         <thead>
           <tr class="sticky top-0 z-10 backdrop-blur-md bg-gray-50/90 dark:bg-[#11463B]/90 border-b border-default text-left text-gray-900 dark:text-white font-semibold">
             <th class="pl-6 pr-4 py-3">
