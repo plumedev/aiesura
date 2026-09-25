@@ -107,7 +107,7 @@ const isMobile = computed(() => width.value > 0 && width.value < 640)
       :model-value="label"
       icon="i-heroicons-calendar-days"
       placeholder="Sélectionner une période"
-      class="font-medium cursor-pointer w-full sm:w-64"
+      class="cursor-pointer w-full sm:w-64"
       :ui="{ base: 'cursor-pointer' }"
     />
 

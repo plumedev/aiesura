@@ -56,41 +56,41 @@ export default defineAppConfig({
     input: {
       slots: {
         root: 'relative inline-flex items-center',
-        base: 'w-full rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white placeholder:!text-gray-400 dark:placeholder:!text-gray-500 !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none text-sm transition-colors',
-        leadingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500',
-        trailingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500'
+        base: 'w-full h-9 rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white placeholder:!text-gray-400 dark:placeholder:!text-gray-500 placeholder:!font-normal !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none !text-sm !leading-5 !font-normal transition-colors',
+        leadingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500 size-5',
+        trailingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500 size-5'
       }
     },
     selectMenu: {
       slots: {
-        base: 'w-full rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none text-sm transition-colors',
-        placeholder: '!text-gray-400 dark:!text-gray-500 font-normal',
-        value: '!text-gray-900 dark:!text-white font-medium',
-        leadingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500',
-        trailingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500',
+        base: 'w-full h-9 rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none !text-sm !leading-5 !font-normal transition-colors',
+        placeholder: '!text-gray-400 dark:!text-gray-500 !font-normal !text-sm',
+        value: '!text-gray-900 dark:!text-white !font-normal !text-sm',
+        leadingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500 size-5',
+        trailingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500 size-5',
         content: 'rounded-md glass-panel !border !border-black/10 dark:!border-white/10 shadow-lg p-1',
-        item: 'rounded-md text-sm text-gray-900 dark:text-white data-highlighted:bg-black/5 dark:data-highlighted:bg-white/10 cursor-pointer'
+        item: 'rounded-md !text-sm text-gray-900 dark:text-white data-highlighted:bg-black/5 dark:data-highlighted:bg-white/10 cursor-pointer'
       }
     },
     select: {
       slots: {
         root: 'relative inline-flex items-center',
-        base: 'w-full rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none text-sm transition-colors',
-        leadingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500',
-        trailingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500',
-        placeholder: '!text-gray-400 dark:!text-gray-500 font-normal',
-        value: '!text-gray-900 dark:!text-white font-medium'
+        base: 'w-full h-9 rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none !text-sm !leading-5 !font-normal transition-colors',
+        leadingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500 size-5',
+        trailingIcon: 'shrink-0 !text-gray-400 dark:!text-gray-500 size-5',
+        placeholder: '!text-gray-400 dark:!text-gray-500 !font-normal !text-sm',
+        value: '!text-gray-900 dark:!text-white !font-normal !text-sm'
       }
     },
     inputDate: {
       slots: {
-        base: 'w-full rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none text-sm transition-colors'
+        base: 'w-full h-9 rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none !text-sm !leading-5 !font-normal transition-colors'
       }
     },
     textarea: {
       slots: {
         root: 'relative inline-flex items-center w-full',
-        base: 'w-full rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white placeholder:!text-gray-400 dark:placeholder:!text-gray-500 !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none text-sm transition-colors'
+        base: 'w-full rounded-md !bg-white/60 dark:!bg-black/25 !text-gray-900 dark:!text-white placeholder:!text-gray-400 dark:placeholder:!text-gray-500 placeholder:!font-normal !border !border-black/10 dark:!border-white/10 hover:!border-black/20 dark:hover:!border-white/20 focus:!border-black/30 dark:focus:!border-white/30 !ring-0 !outline-none !shadow-none !text-sm !leading-5 !font-normal transition-colors'
       }
     },
     calendar: {

@@ -91,6 +91,19 @@ const closeDeleteModal = () => {
   transactionToDelete.value = null
 }
 
+// --- Swipe mobile des transactions ---
+const activeMobileSwipeId = ref<string | null>(null)
+
+const handleEditMobileTransaction = (tx: Transaction) => {
+  activeMobileSwipeId.value = null
+  openEditModal(tx)
+}
+
+const handleDeleteMobileTransaction = (tx: Transaction) => {
+  activeMobileSwipeId.value = null
+  openDeleteModal(tx)
+}
+
 async function confirmDeleteTransaction() {
   if (!transactionToDelete.value) return
   deleteLoading.value = true
@@ -261,55 +274,157 @@ const getDropdownItems = (row: unknown) => [
 
       <UCard
         class="flex-1 flex flex-col min-h-0"
-        :ui="{ body: 'flex-1 overflow-x-auto flex flex-col p-0 sm:p-0' }"
+        :ui="{ body: 'flex-1 flex flex-col p-0 sm:p-0 min-h-0 overflow-hidden' }"
       >
-        <UTable
-          v-model:sorting="sorting"
-          :data="filteredTransactions"
-          :columns="columns"
-          class="flex-1 min-w-[580px]"
-          sticky
-          :ui="{ thead: 'bg-gray-50/90 dark:bg-[#11463B]/90 backdrop-blur-md' }"
-        >
-          <!-- Les headers triables sont définis via sortableHeader() dans le script -->
-          <!-- Cells -->
-          <template #startDate-cell="{ row }">
-            {{ formatDate(getRow(row).startDate as string) }}
-            <span
-              v-if="getRow(row).endDate"
-              class="text-gray-500 text-xs ml-1"
-            >au {{ formatDate(getRow(row).endDate as string) }}</span>
-          </template>
-          <template #frequency-cell="{ row }">
-            {{ formatFrequency(getRow(row).frequency as string) }}
-          </template>
-          <template #type-cell="{ row }">
-            <UBadge
-              :color="getRow(row).type === 'income' ? 'success' : 'error'"
-              variant="subtle"
-            >
-              {{ TRANSACTION_TYPE_LABELS[getRow(row).type as 'income' | 'expense'] }}
-            </UBadge>
-          </template>
-          <template #account-cell="{ row }">
-            {{ (getRow(row).account as any)?.name }}
-          </template>
-          <template #amount-cell="{ row }">
-            <span :class="getRow(row).type === 'income' ? 'text-green-600' : 'text-red-400'">
-              {{ getRow(row).type === 'income' ? '+' : '-' }}{{ getRow(row).amount }} €
-            </span>
-          </template>
-          <template #actions-cell="{ row }">
-            <UDropdownMenu :items="getDropdownItems(row)">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                icon="i-heroicons-ellipsis-horizontal"
-                size="xs"
-              />
-            </UDropdownMenu>
-          </template>
-        </UTable>
+        <!-- ── VUE MOBILE : Cartes swipeables sans scroll horizontal (< lg) ── -->
+        <div class="block lg:hidden flex-1 overflow-y-auto p-3 space-y-2.5">
+          <div
+            v-if="filteredTransactions.length === 0"
+            class="p-8 text-center text-muted"
+          >
+            <UIcon
+              name="i-heroicons-inbox"
+              class="w-8 h-8 mx-auto mb-2 opacity-40"
+            />
+            <p>Aucune transaction trouvée.</p>
+          </div>
+
+          <TransactionsMobileSwipeableRow
+            v-for="tx in filteredTransactions"
+            :id="tx.id"
+            :key="tx.id"
+            v-model:active-id="activeMobileSwipeId"
+            :actions-width="116"
+          >
+            <div class="flex items-center gap-3 p-3">
+              <!-- 1. Icône Dépense / Revenu -->
+              <div
+                :class="[
+                  'w-9 h-9 rounded-full flex items-center justify-center shrink-0 border',
+                  tx.type === 'income'
+                    ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'
+                    : 'bg-red-500/10 text-red-500 border-red-500/20'
+                ]"
+              >
+                <UIcon
+                  :name="tx.type === 'income' ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-left'"
+                  class="w-4 h-4"
+                />
+              </div>
+
+              <!-- 2. Centre : Nom + [Compte & Fréquence/Date] -->
+              <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+                <span class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {{ tx.name }}
+                </span>
+
+                <div class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  <span class="truncate">
+                    {{ (tx.account as any)?.name }}
+                  </span>
+
+                  <span>•</span>
+
+                  <span class="shrink-0 text-[11px] text-gray-400">
+                    {{ formatFrequency(tx.frequency) }} • {{ formatDate(tx.startDate) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- 3. Montant à droite -->
+              <div class="text-right shrink-0">
+                <span
+                  :class="[
+                    'text-sm font-semibold whitespace-nowrap',
+                    tx.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-500'
+                  ]"
+                >
+                  {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount }} €
+                </span>
+              </div>
+            </div>
+
+            <!-- Actions au swipe : Blocs carrés Supprimer & Modifier -->
+            <template #actions>
+              <button
+                type="button"
+                class="w-12 h-12 rounded-xl bg-red-500 hover:bg-red-600 text-white flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-transform cursor-pointer"
+                title="Supprimer la transaction"
+                @click.stop="handleDeleteMobileTransaction(tx)"
+              >
+                <UIcon
+                  name="i-heroicons-trash"
+                  class="w-4 h-4"
+                />
+                <span class="text-[10px] font-medium leading-tight">Supprimer</span>
+              </button>
+
+              <button
+                type="button"
+                class="w-12 h-12 rounded-xl bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/20 text-gray-800 dark:text-gray-100 border border-black/5 dark:border-white/10 flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-transform cursor-pointer"
+                title="Modifier la transaction"
+                @click.stop="handleEditMobileTransaction(tx)"
+              >
+                <UIcon
+                  name="i-heroicons-pencil-square"
+                  class="w-4 h-4"
+                />
+                <span class="text-[10px] font-medium leading-tight">Modifier</span>
+              </button>
+            </template>
+          </TransactionsMobileSwipeableRow>
+        </div>
+
+        <!-- ── VUE DESKTOP : Tableau complet (>= lg) ── -->
+        <div class="hidden lg:block flex-1 overflow-x-auto">
+          <UTable
+            v-model:sorting="sorting"
+            :data="filteredTransactions"
+            :columns="columns"
+            class="flex-1 min-w-[580px]"
+            sticky
+            :ui="{ thead: 'bg-gray-50/90 dark:bg-[#11463B]/90 backdrop-blur-md' }"
+          >
+            <!-- Les headers triables sont définis via sortableHeader() dans le script -->
+            <!-- Cells -->
+            <template #startDate-cell="{ row }">
+              {{ formatDate(getRow(row).startDate as string) }}
+              <span
+                v-if="getRow(row).endDate"
+                class="text-gray-500 text-xs ml-1"
+              >au {{ formatDate(getRow(row).endDate as string) }}</span>
+            </template>
+            <template #frequency-cell="{ row }">
+              {{ formatFrequency(getRow(row).frequency as string) }}
+            </template>
+            <template #type-cell="{ row }">
+              <UBadge
+                :color="getRow(row).type === 'income' ? 'success' : 'error'"
+                variant="subtle"
+              >
+                {{ TRANSACTION_TYPE_LABELS[getRow(row).type as 'income' | 'expense'] }}
+              </UBadge>
+            </template>
+            <template #account-cell="{ row }">
+              {{ (getRow(row).account as any)?.name }}
+            </template>
+            <template #amount-cell="{ row }">
+              <span :class="getRow(row).type === 'income' ? 'text-green-600' : 'text-red-400'">
+                {{ getRow(row).type === 'income' ? '+' : '-' }}{{ getRow(row).amount }} €
+              </span>
+            </template>
+            <template #actions-cell="{ row }">
+              <UDropdownMenu :items="getDropdownItems(row)">
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-ellipsis-horizontal"
+                  size="xs"
+                />
+              </UDropdownMenu>
+            </template>
+          </UTable>
+        </div>
       </UCard>
     </div>
 
