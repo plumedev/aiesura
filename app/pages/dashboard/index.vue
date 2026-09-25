@@ -267,7 +267,7 @@ const formattedCurrentPeriod = computed(() => {
       </template>
     </UDashboardNavbar>
 
-    <div class="flex flex-col gap-6 p-4 h-full overflow-y-auto lg:overflow-hidden pb-28 lg:pb-4">
+    <div class="flex flex-col gap-0 lg:gap-6 p-0 lg:p-4 flex-1 min-h-0 overflow-hidden">
       <!-- ── Sélecteur de période (Desktop) ── -->
       <div class="hidden lg:flex flex-col sm:flex-row sm:items-center gap-2">
         <p class="text-sm mr-2 text-gray-500 dark:text-gray-400 shrink-0">
@@ -384,9 +384,9 @@ const formattedCurrentPeriod = computed(() => {
 
       <!-- ── Tableau des transactions ── -->
       <UCard
-        class="flex-1 min-h-0 flex flex-col"
+        class="flex-1 min-h-0 flex flex-col rounded-none lg:rounded-md !border-none !shadow-none"
         :ui="{
-          root: 'flex flex-col h-full',
+          root: 'flex flex-col h-full rounded-none lg:rounded-md',
           body: 'p-0 sm:p-0 flex-1 min-h-0 overflow-y-auto'
         }"
       >
@@ -417,7 +417,7 @@ const formattedCurrentPeriod = computed(() => {
           class="flex-1 flex flex-col min-h-0"
         >
           <!-- ── VUE MOBILE : Liste de cartes swipeables (< lg) ── -->
-          <div class="block lg:hidden p-3 space-y-2.5">
+          <div class="block lg:hidden px-4 py-3 space-y-2.5">
             <template
               v-for="tx in items"
               :key="tx.id"
@@ -803,7 +803,7 @@ const formattedCurrentPeriod = computed(() => {
     <!-- ── BARRE INFÉRIEURE MOBILE D'ANCRAGE (Bottom Sheet Trigger) ── -->
     <div
       ref="bottomBarRef"
-      class="fixed bottom-0 inset-x-0 z-20 lg:hidden border-t border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] shadow-2xl transition-all select-none"
+      class="relative shrink-0 z-20 lg:hidden border-t border-black/10 dark:border-white/10 bg-[#F1F5F3] dark:bg-[#0C3C32] shadow-2xl transition-all select-none pb-[env(safe-area-inset-bottom)]"
     >
       <!-- Poignée tactile incitant au clic / swipe up -->
       <button
