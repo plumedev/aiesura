@@ -1,6 +1,6 @@
 import { db } from '~~/server/database/db'
 import { transactions, transactionIterations, accounts } from '~~/server/database/schema'
-import { and, eq, between, ilike, inArray, gte, lte, gt, lt, asc } from 'drizzle-orm'
+import { and, eq, between, ilike, inArray, gte, lte, gt, lt, asc, isNull } from 'drizzle-orm'
 import { requireUser } from '~~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -45,8 +45,8 @@ export default defineEventHandler(async (event) => {
     iterationConditions.push(gt(transactionIterations.amount, '500'))
   }
 
-  // Construire les conditions sur les transactions parentes
-  const txConditions = [eq(transactions.userId, userId)]
+  // Construire les conditions sur les transactions parentes (hors archivées)
+  const txConditions = [eq(transactions.userId, userId), isNull(transactions.archivedAt)]
 
   if (search) {
     txConditions.push(ilike(transactions.name, `%${search}%`))

@@ -13,6 +13,7 @@ const patchTransactionSchema = z.object({
   frequency: z.enum(['once', 'monthly', 'quarterly', 'yearly']).optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().nullable().optional(),
+  effectiveDate: z.string().datetime().optional(),
   updateMode: z.enum(['single', 'all', 'future']).optional()
 })
 
@@ -134,12 +135,13 @@ export default defineEventHandler(async (event) => {
     return tx
   } else if (updateMode === 'future') {
     // Mode "future" : scission de la transaction
-    const effectiveDateStr = data.startDate || new Date().toISOString()
+    const effectiveDateStr = data.effectiveDate || data.startDate || new Date().toISOString()
     const effectiveDate = new Date(effectiveDateStr)
 
     // A. Fixer la date de fin de la transaction d'origine à la veille
     const dayBefore = new Date(effectiveDate)
     dayBefore.setDate(dayBefore.getDate() - 1)
+    dayBefore.setHours(23, 59, 59, 999)
 
     const updatedOriginal = await db
       .update(transactions)

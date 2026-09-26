@@ -148,12 +148,90 @@ const occurrenceCount = computed(() => {
   return count
 })
 
+const selectedEffectiveDate = ref<string>('')
+const customEffectiveDate = ref<string>('')
+
+// Calcul des prochaines itérations attendues pour la transaction éditée
+const futureIterationOptions = computed(() => {
+  if (!props.transaction || props.transaction.frequency === 'once') return []
+
+  const start = new Date(props.transaction.startDate)
+  const end = props.transaction.endDate ? new Date(props.transaction.endDate) : null
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+
+  const options: Array<{ label: string, value: string }> = []
+  const current = new Date(start)
+  let count = 0
+
+  while ((!end || current <= end) && count < 120) {
+    count++
+    const iterDate = new Date(current)
+    iterDate.setHours(0, 0, 0, 0)
+
+    if (iterDate >= now) {
+      const formatted = iterDate.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+      const isNext = options.length === 0
+      options.push({
+        label: isNext ? `${formatted} (prochaine itération)` : formatted,
+        value: iterDate.toISOString()
+      })
+      if (options.length >= 12) break
+    }
+
+    if (props.transaction.frequency === 'monthly') {
+      current.setMonth(current.getMonth() + 1)
+    } else if (props.transaction.frequency === 'quarterly') {
+      current.setMonth(current.getMonth() + 3)
+    } else if (props.transaction.frequency === 'yearly') {
+      current.setFullYear(current.getFullYear() + 1)
+    }
+  }
+
+  options.push({
+    label: 'Autre date personnalisée...',
+    value: 'custom'
+  })
+
+  return options
+})
+
+watch(showConfirmModal, (isOpen) => {
+  if (isOpen) {
+    if (futureIterationOptions.value.length > 1) {
+      selectedEffectiveDate.value = futureIterationOptions.value[0]!.value
+    } else {
+      selectedEffectiveDate.value = 'custom'
+      customEffectiveDate.value = new Date().toISOString().split('T')[0]!
+    }
+  }
+})
+
+const closeConfirmModal = () => {
+  showConfirmModal.value = false
+}
+
 async function executeSubmit(mode?: 'all' | 'future' | 'single') {
   loading.value = true
   if (mode !== 'single') {
     isSubmitting.value = true
   }
   try {
+    let effectiveDateIso: string | undefined = undefined
+    if (mode === 'future') {
+      if (selectedEffectiveDate.value === 'custom' && customEffectiveDate.value) {
+        effectiveDateIso = new Date(customEffectiveDate.value).toISOString()
+      } else if (selectedEffectiveDate.value && selectedEffectiveDate.value !== 'custom') {
+        effectiveDateIso = selectedEffectiveDate.value
+      } else {
+        effectiveDateIso = futureIterationOptions.value[0]?.value || new Date().toISOString()
+      }
+    }
+
     const payload = {
       name: state.name,
       amount: Number(state.amount),
@@ -162,6 +240,7 @@ async function executeSubmit(mode?: 'all' | 'future' | 'single') {
       frequency: state.frequency,
       startDate: state.startDate.toISOString(),
       endDate: (state.hasEndDate && state.endDate) ? state.endDate.toISOString() : null,
+      effectiveDate: effectiveDateIso,
       updateMode: mode
     }
 
@@ -348,9 +427,38 @@ async function submitEdit(mode: 'all' | 'future') {
   >
     <div class="flex flex-col gap-4">
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        Cette transaction est récurrente. Comment souhaitez-vous appliquer vos modifications ?
+        Cette transaction est récurrente. Choisissez comment et à partir de quand appliquer ces modifications.
       </p>
-      <div class="flex flex-col gap-2 mt-2">
+
+      <div class="p-3.5 rounded-lg border border-black/10 dark:border-white/10 bg-white/40 dark:bg-black/20 flex flex-col gap-2">
+        <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+          À partir de quelle itération ?
+        </label>
+        <USelectMenu
+          v-model="selectedEffectiveDate"
+          :items="futureIterationOptions"
+          value-key="value"
+          label-key="label"
+          placeholder="Sélectionnez l'itération d'effet"
+          class="w-full"
+        />
+        <div
+          v-if="selectedEffectiveDate === 'custom'"
+          class="pt-1"
+        >
+          <UInput
+            v-model="customEffectiveDate"
+            type="date"
+            placeholder="YYYY-MM-DD"
+            class="w-full"
+          />
+        </div>
+        <p class="text-[11px] text-gray-500 dark:text-gray-400">
+          Les itérations antérieures à cette date conserveront leurs montants et informations d'origine.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-2 mt-1">
         <UButton
           color="primary"
           variant="solid"
@@ -358,7 +466,7 @@ async function submitEdit(mode: 'all' | 'future') {
           :loading="isSubmitting && updateMode === 'future'"
           @click="submitEdit('future')"
         >
-          Uniquement les prochaines itérations
+          Appliquer à partir de cette itération
         </UButton>
         <UButton
           color="neutral"
@@ -370,11 +478,11 @@ async function submitEdit(mode: 'all' | 'future') {
           Toutes les itérations (passées et futures)
         </UButton>
       </div>
-      <div class="flex justify-end mt-4 border-t border-default pt-4">
+      <div class="flex justify-end mt-2 border-t border-default pt-3">
         <UButton
           color="neutral"
           variant="ghost"
-          @click="showConfirmModal = false"
+          @click="closeConfirmModal"
         >
           Annuler
         </UButton>

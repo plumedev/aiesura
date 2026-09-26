@@ -10,10 +10,20 @@ interface Transaction {
   type: 'income' | 'expense'
   amount: string
   accountId: string
+  archivedAt?: string | null
   account: { id: string, name: string }
 }
 
-const { data: transactions, refresh } = await useFetch<Transaction[]>('/api/transactions')
+const showArchived = ref(false)
+const toggleShowArchived = () => {
+  showArchived.value = !showArchived.value
+}
+
+const { data: transactions, refresh } = await useFetch<Transaction[]>('/api/transactions', {
+  query: computed(() => ({
+    archived: showArchived.value ? 'true' : 'false'
+  }))
+})
 
 const isModalOpen = ref(false)
 const search = ref('')
@@ -91,6 +101,52 @@ const closeDeleteModal = () => {
   transactionToDelete.value = null
 }
 
+// --- Archivage des transactions ---
+const archiveLoading = ref(false)
+const transactionToArchive = ref<Transaction | null>(null)
+const isArchiveModalOpen = ref(false)
+
+const openArchiveModal = (transaction: Transaction) => {
+  transactionToArchive.value = transaction
+  isArchiveModalOpen.value = true
+}
+
+const closeArchiveModal = () => {
+  isArchiveModalOpen.value = false
+  transactionToArchive.value = null
+}
+
+async function confirmArchiveTransaction() {
+  if (!transactionToArchive.value) return
+  archiveLoading.value = true
+  const isCurrentlyArchived = !!transactionToArchive.value.archivedAt
+  try {
+    await $fetch(`/api/transactions/${transactionToArchive.value.id}/archive`, {
+      method: 'PATCH',
+      body: { archive: !isCurrentlyArchived }
+    })
+    toast.add({
+      title: isCurrentlyArchived ? 'Transaction désarchivée' : 'Transaction archivée',
+      description: isCurrentlyArchived
+        ? 'La transaction est à nouveau active.'
+        : 'La transaction a été archivée.',
+      color: 'success'
+    })
+    closeArchiveModal()
+    refresh()
+  } catch {
+    toast.add({
+      title: 'Erreur',
+      description: isCurrentlyArchived
+        ? 'Impossible de désarchiver la transaction'
+        : 'Impossible d\'archiver la transaction',
+      color: 'error'
+    })
+  } finally {
+    archiveLoading.value = false
+  }
+}
+
 // --- Swipe mobile des transactions ---
 const activeMobileSwipeId = ref<string | null>(null)
 
@@ -102,6 +158,11 @@ const handleEditMobileTransaction = (tx: Transaction) => {
 const handleDeleteMobileTransaction = (tx: Transaction) => {
   activeMobileSwipeId.value = null
   openDeleteModal(tx)
+}
+
+const handleArchiveMobileTransaction = (tx: Transaction) => {
+  activeMobileSwipeId.value = null
+  openArchiveModal(tx)
 }
 
 async function confirmDeleteTransaction() {
@@ -161,27 +222,39 @@ const openModal = () => {
 
 const getRow = (row: unknown): Record<string, unknown> => (row as { original?: Record<string, unknown> }).original || (row as Record<string, unknown>)
 
-const getDropdownItems = (row: unknown) => [
-  [
-    {
-      label: 'Éditer',
-      icon: 'i-heroicons-pencil-square',
-      onSelect: () => {
-        openEditModal(getRow(row) as unknown as Transaction)
+const getDropdownItems = (row: unknown) => {
+  const tx = getRow(row) as unknown as Transaction
+  const isArchived = !!tx.archivedAt
+
+  return [
+    [
+      {
+        label: 'Éditer',
+        icon: 'i-heroicons-pencil-square',
+        onSelect: () => {
+          openEditModal(tx)
+        }
+      },
+      {
+        label: isArchived ? 'Désarchiver' : 'Archiver',
+        icon: isArchived ? 'i-heroicons-arrow-uturn-left' : 'i-heroicons-archive-box',
+        onSelect: () => {
+          openArchiveModal(tx)
+        }
       }
-    }
-  ],
-  [
-    {
-      label: 'Supprimer',
-      icon: 'i-heroicons-trash',
-      color: 'error' as const,
-      onSelect: () => {
-        openDeleteModal(getRow(row) as unknown as Transaction)
+    ],
+    [
+      {
+        label: 'Supprimer',
+        icon: 'i-heroicons-trash',
+        color: 'error' as const,
+        onSelect: () => {
+          openDeleteModal(tx)
+        }
       }
-    }
+    ]
   ]
-]
+}
 // formatFrequency et TRANSACTION_TYPE_LABELS sont auto-importés depuis ~/utils
 </script>
 
@@ -264,12 +337,26 @@ const getDropdownItems = (row: unknown) => [
       </div>
 
       <UCard>
-        <UInput
-          v-model="search"
-          icon="i-heroicons-magnifying-glass"
-          placeholder="Rechercher une transaction..."
-          class="w-full sm:w-72"
-        />
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <UInput
+            v-model="search"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="Rechercher une transaction..."
+            class="w-full sm:w-72"
+          />
+
+          <div class="flex items-center gap-2">
+            <UButton
+              :color="showArchived ? 'primary' : 'neutral'"
+              :variant="showArchived ? 'solid' : 'outline'"
+              :icon="showArchived ? 'i-heroicons-arrow-uturn-left' : 'i-heroicons-archive-box'"
+              size="sm"
+              @click="toggleShowArchived"
+            >
+              {{ showArchived ? 'Voir les transactions actives' : 'Afficher les archivées' }}
+            </UButton>
+          </div>
+        </div>
       </UCard>
 
       <UCard
@@ -294,7 +381,7 @@ const getDropdownItems = (row: unknown) => [
             :id="tx.id"
             :key="tx.id"
             v-model:active-id="activeMobileSwipeId"
-            :actions-width="116"
+            :actions-width="170"
           >
             <div class="flex items-center gap-3 p-3">
               <!-- 1. Icône Dépense / Revenu -->
@@ -314,9 +401,20 @@ const getDropdownItems = (row: unknown) => [
 
               <!-- 2. Centre : Nom + [Compte & Fréquence/Date] -->
               <div class="flex-1 min-w-0 flex flex-col gap-0.5">
-                <span class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {{ tx.name }}
-                </span>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {{ tx.name }}
+                  </span>
+                  <UBadge
+                    v-if="tx.archivedAt"
+                    size="xs"
+                    color="neutral"
+                    variant="subtle"
+                    class="shrink-0"
+                  >
+                    Archivée
+                  </UBadge>
+                </div>
 
                 <div class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                   <span class="truncate">
@@ -344,7 +442,7 @@ const getDropdownItems = (row: unknown) => [
               </div>
             </div>
 
-            <!-- Actions au swipe : Blocs carrés Supprimer & Modifier -->
+            <!-- Actions au swipe : Blocs carrés Supprimer, Archiver & Modifier -->
             <template #actions>
               <button
                 type="button"
@@ -357,6 +455,19 @@ const getDropdownItems = (row: unknown) => [
                   class="w-4 h-4"
                 />
                 <span class="text-[10px] font-medium leading-tight">Supprimer</span>
+              </button>
+
+              <button
+                type="button"
+                class="w-12 h-12 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-transform cursor-pointer"
+                :title="tx.archivedAt ? 'Désarchiver la transaction' : 'Archiver la transaction'"
+                @click.stop="handleArchiveMobileTransaction(tx)"
+              >
+                <UIcon
+                  :name="tx.archivedAt ? 'i-heroicons-arrow-uturn-left' : 'i-heroicons-archive-box'"
+                  class="w-4 h-4"
+                />
+                <span class="text-[10px] font-medium leading-tight">{{ tx.archivedAt ? 'Restaurer' : 'Archiver' }}</span>
               </button>
 
               <button
@@ -387,6 +498,19 @@ const getDropdownItems = (row: unknown) => [
           >
             <!-- Les headers triables sont définis via sortableHeader() dans le script -->
             <!-- Cells -->
+            <template #name-cell="{ row }">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-gray-900 dark:text-white">{{ getRow(row).name }}</span>
+                <UBadge
+                  v-if="getRow(row).archivedAt"
+                  size="xs"
+                  color="neutral"
+                  variant="subtle"
+                >
+                  Archivée
+                </UBadge>
+              </div>
+            </template>
             <template #startDate-cell="{ row }">
               {{ formatDate(getRow(row).startDate as string) }}
               <span
@@ -465,6 +589,28 @@ const getDropdownItems = (row: unknown) => [
     >
       <p class="text-gray-600 dark:text-gray-300 text-sm">
         Êtes-vous sûr de vouloir supprimer la transaction <strong class="text-gray-900 dark:text-white">« {{ transactionToDelete?.name }} »</strong> ?
+      </p>
+    </AppModal>
+
+    <!-- Modale de confirmation d'archivage / désarchivage -->
+    <AppModal
+      v-model:open="isArchiveModalOpen"
+      :title="transactionToArchive?.archivedAt ? 'Confirmer le désarchivage' : 'Confirmer l\'archivage'"
+      :icon="transactionToArchive?.archivedAt ? 'i-heroicons-arrow-uturn-left' : 'i-heroicons-archive-box'"
+      icon-class="text-amber-500"
+      :confirm-label="transactionToArchive?.archivedAt ? 'Oui, désarchiver' : 'Oui, archiver'"
+      :confirm-color="transactionToArchive?.archivedAt ? 'primary' : 'warning'"
+      :loading="archiveLoading"
+      @confirm="confirmArchiveTransaction"
+      @cancel="closeArchiveModal"
+    >
+      <p class="text-gray-600 dark:text-gray-300 text-sm">
+        <template v-if="transactionToArchive?.archivedAt">
+          Êtes-vous sûr de vouloir désarchiver la transaction <strong class="text-gray-900 dark:text-white">« {{ transactionToArchive?.name }} »</strong> ? Elle réapparaîtra dans votre liste active de transactions et ses itérations futures seront réactivées.
+        </template>
+        <template v-else>
+          Êtes-vous sûr de vouloir archiver la transaction <strong class="text-gray-900 dark:text-white">« {{ transactionToArchive?.name }} »</strong> ? Elle ne sera plus visible dans votre liste active et sera exclue des flux futurs.
+        </template>
       </p>
     </AppModal>
   </UDashboardPanel>

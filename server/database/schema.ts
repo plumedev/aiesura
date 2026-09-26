@@ -31,6 +31,7 @@ export const transactions = pgTable('transactions', {
   frequency: text('frequency').notNull(), // 'once' | 'monthly' | 'quarterly' | 'yearly'
   startDate: timestamp('start_date').notNull(),
   endDate: timestamp('end_date'),
+  archivedAt: timestamp('archived_at'),
   createdAt: timestamp('created_at').defaultNow().notNull()
 })
 
