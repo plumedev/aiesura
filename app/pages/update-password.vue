@@ -27,19 +27,22 @@ const updatePassword = async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
+  <div class="flex items-center justify-center min-h-[calc(100vh-140px)] py-12 px-4 sm:px-6">
     <UCard class="w-full max-w-sm">
       <template #header>
-        <h2 class="text-xl font-semibold text-center">
-          Nouveau mot de passe
-        </h2>
+        <div class="flex flex-col items-center gap-1.5 text-center">
+          <AppLogo class="w-auto h-7 text-[#0A332C] dark:text-emerald-400 mb-1" />
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+            Nouveau mot de passe
+          </h2>
+        </div>
       </template>
 
       <form
-        class="space-y-6"
+        class="space-y-5"
         @submit.prevent="updatePassword"
       >
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
           Veuillez saisir votre nouveau mot de passe ci-dessous.
         </p>
 

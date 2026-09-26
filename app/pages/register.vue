@@ -29,16 +29,22 @@ const register = async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
+  <div class="flex items-center justify-center min-h-[calc(100vh-140px)] py-12 px-4 sm:px-6">
     <UCard class="w-full max-w-sm">
       <template #header>
-        <h2 class="text-xl font-semibold text-center">
-          Créer un compte
-        </h2>
+        <div class="flex flex-col items-center gap-1.5 text-center">
+          <AppLogo class="w-auto h-7 text-[#0A332C] dark:text-emerald-400 mb-1" />
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+            Créer un compte
+          </h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Commencez à piloter vos finances avec Aiesura
+          </p>
+        </div>
       </template>
 
       <form
-        class="space-y-6"
+        class="space-y-5"
         @submit.prevent="register"
       >
         <UFormField
@@ -93,11 +99,14 @@ const register = async () => {
       </form>
 
       <template #footer>
-        <div class="text-sm text-center">
-          Déjà un compte ? <ULink
+        <div class="text-sm text-center text-gray-600 dark:text-gray-300">
+          <span>Déjà un compte ? </span>
+          <ULink
             to="/login"
-            class="text-primary-500 hover:underline"
-          >Se connecter</ULink>
+            class="text-emerald-700 hover:text-emerald-800 dark:text-[#50E8A8] dark:hover:text-[#A1EACA] font-medium transition-colors hover:underline"
+          >
+            Se connecter
+          </ULink>
         </div>
       </template>
     </UCard>

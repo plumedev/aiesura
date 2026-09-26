@@ -19,6 +19,13 @@ const toggleShowArchived = () => {
   showArchived.value = !showArchived.value
 }
 
+const isTransactionExpired = (tx: { endDate?: string | null }) => {
+  if (!tx.endDate) return false
+  const end = new Date(tx.endDate)
+  end.setHours(23, 59, 59, 999)
+  return end < new Date()
+}
+
 const { data: transactions, refresh } = await useFetch<Transaction[]>('/api/transactions', {
   query: computed(() => ({
     archived: showArchived.value ? 'true' : 'false'
@@ -412,7 +419,7 @@ const getDropdownItems = (row: unknown) => {
                     variant="subtle"
                     class="shrink-0"
                   >
-                    Archivée
+                    {{ isTransactionExpired(tx) ? 'Terminée' : 'Archivée' }}
                   </UBadge>
                 </div>
 
@@ -507,7 +514,7 @@ const getDropdownItems = (row: unknown) => {
                   color="neutral"
                   variant="subtle"
                 >
-                  Archivée
+                  {{ isTransactionExpired(getRow(row)) ? 'Terminée' : 'Archivée' }}
                 </UBadge>
               </div>
             </template>
