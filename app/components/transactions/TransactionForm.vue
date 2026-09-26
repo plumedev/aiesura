@@ -40,6 +40,14 @@ const schema = z.object({
 }, {
   message: 'La date de fin est requise',
   path: ['endDate']
+}).refine((data) => {
+  if (data.hasEndDate && data.endDate && data.startDate) {
+    return data.endDate >= data.startDate
+  }
+  return true
+}, {
+  message: 'La date de fin ne peut pas être antérieure à la date de début',
+  path: ['endDate']
 })
 
 const isEdition = computed(() => !!props.transaction)
@@ -272,9 +280,57 @@ async function executeSubmit(mode?: 'all' | 'future' | 'single') {
   }
 }
 
+// Détecte si seule la date de fin a été modifiée
+const isOnlyEndDateChanged = computed(() => {
+  if (!props.transaction) return false
+  const orig = props.transaction
+  const origHasEndDate = !!orig.endDate
+  const origEndDateStr = orig.endDate ? new Date(orig.endDate).toISOString().split('T')[0] : ''
+  const currentEndDateStr = (state.hasEndDate && state.endDate) ? new Date(state.endDate).toISOString().split('T')[0] : ''
+
+  const endDateChanged = (origHasEndDate !== state.hasEndDate) || (origEndDateStr !== currentEndDateStr)
+  const nameUnchanged = state.name === orig.name
+  const amountUnchanged = Number(state.amount) === Number(orig.amount)
+  const accountUnchanged = state.accountId === orig.accountId
+  const typeUnchanged = state.type === orig.type
+  const frequencyUnchanged = state.frequency === orig.frequency
+  const startDateUnchanged = new Date(state.startDate).toISOString().split('T')[0] === new Date(orig.startDate).toISOString().split('T')[0]
+
+  return endDateChanged && nameUnchanged && amountUnchanged && accountUnchanged && typeUnchanged && frequencyUnchanged && startDateUnchanged
+})
+
+// Détecte si la scission future est possible par rapport à la date de fin saisie
+const canSplitFuture = computed(() => {
+  if (!isEdition.value || state.frequency === 'once') return false
+  if (!state.hasEndDate || !state.endDate) return true
+
+  let targetEffectiveDate: Date
+  if (selectedEffectiveDate.value === 'custom' && customEffectiveDate.value) {
+    targetEffectiveDate = new Date(customEffectiveDate.value)
+  } else if (selectedEffectiveDate.value && selectedEffectiveDate.value !== 'custom') {
+    targetEffectiveDate = new Date(selectedEffectiveDate.value)
+  } else if (futureIterationOptions.value[0]?.value) {
+    targetEffectiveDate = new Date(futureIterationOptions.value[0].value)
+  } else {
+    targetEffectiveDate = new Date()
+  }
+
+  targetEffectiveDate.setHours(0, 0, 0, 0)
+  const end = new Date(state.endDate)
+  end.setHours(0, 0, 0, 0)
+
+  return end > targetEffectiveDate
+})
+
 async function onSubmit() {
   if (isEdition.value && state.frequency !== 'once') {
-    showConfirmModal.value = true
+    // Si seule la date de fin a été modifiée ou si la date de fin est antérieure/égale à l'itération future,
+    // la scission future n'a pas de sens : on applique directement la modification à la transaction existante.
+    if (isOnlyEndDateChanged.value || !canSplitFuture.value) {
+      await executeSubmit('all')
+    } else {
+      showConfirmModal.value = true
+    }
   } else {
     await executeSubmit(isEdition.value ? 'single' : undefined)
   }
@@ -283,6 +339,18 @@ async function onSubmit() {
 async function submitEdit(mode: 'all' | 'future') {
   updateMode.value = mode
   await executeSubmit(mode)
+}
+
+const submitEditFuture = () => {
+  submitEdit('future')
+}
+
+const submitEditAll = () => {
+  submitEdit('all')
+}
+
+const handleCancel = () => {
+  emit('close')
 }
 </script>
 
@@ -406,7 +474,7 @@ async function submitEdit(mode: 'all' | 'future') {
       <UButton
         color="neutral"
         variant="ghost"
-        @click="emit('close')"
+        @click="handleCancel"
       >
         Annuler
       </UButton>
@@ -463,17 +531,24 @@ async function submitEdit(mode: 'all' | 'future') {
           color="primary"
           variant="solid"
           class="justify-center"
+          :disabled="!canSplitFuture"
           :loading="isSubmitting && updateMode === 'future'"
-          @click="submitEdit('future')"
+          @click="submitEditFuture"
         >
           Appliquer à partir de cette itération
         </UButton>
+        <p
+          v-if="!canSplitFuture"
+          class="text-xs text-amber-600 dark:text-amber-400"
+        >
+          La date de fin saisie est antérieure ou égale à cette itération. Choisissez « Toutes les itérations » pour mettre à jour cette transaction.
+        </p>
         <UButton
           color="neutral"
           variant="outline"
           class="justify-center"
           :loading="isSubmitting && updateMode === 'all'"
-          @click="submitEdit('all')"
+          @click="submitEditAll"
         >
           Toutes les itérations (passées et futures)
         </UButton>

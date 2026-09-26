@@ -48,7 +48,34 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Transaction introuvable' })
   }
 
-  const updateMode = data.updateMode || (existingTransaction.frequency === 'once' ? 'single' : 'all')
+  let updateMode = data.updateMode || (existingTransaction.frequency === 'once' ? 'single' : 'all')
+
+  const effectiveDateStr = data.effectiveDate || data.startDate || new Date().toISOString()
+  const effectiveDate = new Date(effectiveDateStr)
+  effectiveDate.setHours(0, 0, 0, 0)
+
+  const resolvedEndDate = data.endDate !== undefined
+    ? (data.endDate ? new Date(data.endDate) : null)
+    : existingTransaction.endDate
+
+  const finalStartDate = data.startDate ? new Date(data.startDate) : existingTransaction.startDate
+  if (resolvedEndDate && resolvedEndDate < finalStartDate) {
+    throw createError({
+      statusCode: 400,
+      message: 'La date de fin ne peut pas être antérieure à la date de début'
+    })
+  }
+
+  // Garde-fou : si une date de fin est définie et qu'elle est antérieure ou égale à la date d'effet,
+  // la scission future créerait une transaction scindée avec startDate >= endDate.
+  // On bascule donc automatiquement en mise à jour directe (mode 'all' ou 'single').
+  if (updateMode === 'future' && resolvedEndDate) {
+    const endCheck = new Date(resolvedEndDate)
+    endCheck.setHours(0, 0, 0, 0)
+    if (endCheck <= effectiveDate) {
+      updateMode = existingTransaction.frequency === 'once' ? 'single' : 'all'
+    }
+  }
 
   if (updateMode === 'single' || updateMode === 'all') {
     // 1. Mettre à jour la transaction
