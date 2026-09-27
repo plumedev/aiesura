@@ -6,7 +6,7 @@ import { requireUser } from '~~/server/utils/auth'
 
 const patchSchema = z.object({
   name: z.string().min(1).optional(),
-  amount: z.number().positive().optional(),
+  amount: z.number().min(0).optional(),
   type: z.enum(['income', 'expense']).optional(),
   executionDate: z.string().datetime().optional()
 })

@@ -121,6 +121,83 @@ const handleResetMobileIteration = async (id: string) => {
   await resetIteration(id)
 }
 
+const setIterationToZero = async (iteration: TransactionIteration) => {
+  try {
+    await $fetch(`/api/overview/iterations/${iteration.id}`, {
+      method: 'PATCH',
+      body: { amount: 0 }
+    })
+    toast.add({
+      title: 'Itération mise à 0 €',
+      description: 'Le montant a été mis à 0,00 €.',
+      color: 'success'
+    })
+    await refreshAll()
+  } catch {
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de mettre à 0 € l\'itération.',
+      color: 'error'
+    })
+  }
+}
+
+// --- Suppression d'une itération ---
+const iterationToDelete = ref<TransactionIteration | null>(null)
+const isDeleteIterationModalOpen = computed({
+  get: () => !!iterationToDelete.value,
+  set: (val) => {
+    if (!val) iterationToDelete.value = null
+  }
+})
+const deleteIterationLoading = ref(false)
+
+const openDeleteIterationModal = (iteration: TransactionIteration) => {
+  if (editingIteration.value) {
+    editingIteration.value = null
+  }
+  iterationToDelete.value = iteration
+}
+
+const closeDeleteIterationModal = () => {
+  iterationToDelete.value = null
+}
+
+const handleEditDelete = (iteration: TransactionIteration) => {
+  closeEditModal()
+  openDeleteIterationModal(iteration)
+}
+
+const handleDeleteMobileIteration = (iter: TransactionIteration) => {
+  activeMobileSwipeId.value = null
+  openDeleteIterationModal(iter)
+}
+
+const confirmDeleteIteration = async () => {
+  if (!iterationToDelete.value) return
+  deleteIterationLoading.value = true
+  try {
+    await $fetch(`/api/overview/iterations/${iterationToDelete.value.id}`, {
+      method: 'DELETE'
+    })
+    toast.add({
+      title: 'Itération supprimée',
+      description: 'L\'itération a été supprimée avec succès.',
+      color: 'success'
+    })
+    closeDeleteIterationModal()
+    await refreshAll()
+  } catch {
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de supprimer l\'itération.',
+      color: 'error'
+    })
+  } finally {
+    deleteIterationLoading.value = false
+  }
+}
+
 // --- Scroll infini : sentinelle ---
 const sentinel = ref<HTMLElement | null>(null)
 
@@ -177,6 +254,14 @@ const getIterationDropdown = (iteration: TransactionIteration) => {
     }
   ]
 
+  if (iteration.amount !== 0) {
+    items.push({
+      label: 'Mettre à 0 €',
+      icon: 'i-heroicons-receipt-refund',
+      onSelect: () => setIterationToZero(iteration)
+    })
+  }
+
   if (iteration.isModified) {
     items.push({
       label: 'Réinitialiser',
@@ -185,7 +270,17 @@ const getIterationDropdown = (iteration: TransactionIteration) => {
     })
   }
 
-  return [items]
+  return [
+    items,
+    [
+      {
+        label: 'Supprimer',
+        icon: 'i-heroicons-trash',
+        color: 'error' as const,
+        onSelect: () => openDeleteIterationModal(iteration)
+      }
+    ]
+  ]
 }
 
 const hasFilters = computed(() =>
@@ -426,7 +521,7 @@ const formattedCurrentPeriod = computed(() => {
               <TransactionsMobileSwipeableRow
                 :id="tx.id"
                 v-model:active-id="activeMobileSwipeId"
-                :actions-width="tx.iterationCount === 1 ? (tx.iterations?.[0]?.isModified ? 116 : 60) : 0"
+                :actions-width="tx.iterationCount === 1 ? (tx.iterations?.[0]?.isModified ? 170 : 116) : 0"
                 :disabled="tx.iterationCount > 1"
                 @click="tx.iterationCount > 1 ? toggleRow(tx.id) : undefined"
               >
@@ -533,6 +628,19 @@ const formattedCurrentPeriod = computed(() => {
                     />
                     <span class="text-[10px] font-medium leading-tight">Modifier</span>
                   </button>
+
+                  <button
+                    type="button"
+                    class="w-12 h-12 rounded-xl bg-red-500 hover:bg-red-600 text-white flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-transform cursor-pointer"
+                    title="Supprimer l'itération"
+                    @click.stop="handleDeleteMobileIteration(tx.iterations[0])"
+                  >
+                    <UIcon
+                      name="i-heroicons-trash"
+                      class="w-4 h-4"
+                    />
+                    <span class="text-[10px] font-medium leading-tight">Supprimer</span>
+                  </button>
                 </template>
               </TransactionsMobileSwipeableRow>
 
@@ -546,7 +654,7 @@ const formattedCurrentPeriod = computed(() => {
                   :id="iter.id"
                   :key="iter.id"
                   v-model:active-id="activeMobileSwipeId"
-                  :actions-width="iter.isModified ? 116 : 60"
+                  :actions-width="iter.isModified ? 170 : 116"
                 >
                   <div class="flex items-center gap-2.5 p-2.5">
                     <div
@@ -611,6 +719,19 @@ const formattedCurrentPeriod = computed(() => {
                         class="w-4 h-4"
                       />
                       <span class="text-[10px] font-medium leading-tight">Modifier</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="w-12 h-12 rounded-xl bg-red-500 hover:bg-red-600 text-white flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-transform cursor-pointer"
+                      title="Supprimer l'itération"
+                      @click.stop="handleDeleteMobileIteration(iter)"
+                    >
+                      <UIcon
+                        name="i-heroicons-trash"
+                        class="w-4 h-4"
+                      />
+                      <span class="text-[10px] font-medium leading-tight">Supprimer</span>
                     </button>
                   </template>
                 </TransactionsMobileSwipeableRow>
@@ -1040,6 +1161,7 @@ const formattedCurrentPeriod = computed(() => {
       :iteration="editingIteration"
       @close="closeEditModal"
       @success="handleEditSuccess"
+      @delete="handleEditDelete"
     />
 
     <!-- Modale de transaction ponctuelle -->
@@ -1049,5 +1171,21 @@ const formattedCurrentPeriod = computed(() => {
       @close="closeOneTimeModal"
       @success="handleOneTimeSuccess"
     />
+
+    <!-- Modale de confirmation de suppression d'itération -->
+    <AppModal
+      v-model:open="isDeleteIterationModalOpen"
+      title="Confirmer la suppression"
+      icon="i-heroicons-exclamation-triangle"
+      confirm-label="Oui, supprimer"
+      confirm-color="error"
+      :loading="deleteIterationLoading"
+      @confirm="confirmDeleteIteration"
+      @cancel="closeDeleteIterationModal"
+    >
+      <p class="text-gray-600 dark:text-gray-300 text-sm">
+        Êtes-vous sûr de vouloir supprimer l'itération <strong class="text-gray-900 dark:text-white">« {{ iterationToDelete?.name }} »</strong> du {{ iterationToDelete ? formatDate(iterationToDelete.executionDate) : '' }} ?
+      </p>
+    </AppModal>
   </UDashboardPanel>
 </template>

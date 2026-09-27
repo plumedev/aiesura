@@ -8,6 +8,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
   success: []
+  delete: [iteration: TransactionIteration]
 }>()
 
 const toast = useToast()
@@ -33,6 +34,14 @@ const isSubmitting = ref(false)
 
 const closeModal = () => {
   emit('close')
+}
+
+const setAmountToZero = () => {
+  form.amount = 0
+}
+
+const handleDelete = () => {
+  emit('delete', props.iteration)
 }
 
 const handleSubmit = async () => {
@@ -86,14 +95,26 @@ const handleSubmit = async () => {
 
       <!-- Montant -->
       <UFormField label="Montant (€)">
-        <UInput
-          v-model.number="form.amount"
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder="0.00"
-          class="w-full"
-        />
+        <div class="flex items-center gap-2">
+          <UInput
+            v-model.number="form.amount"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="0.00"
+            class="flex-1"
+          />
+          <UButton
+            v-if="form.amount !== 0"
+            type="button"
+            color="neutral"
+            variant="subtle"
+            size="sm"
+            @click="setAmountToZero"
+          >
+            0 €
+          </UButton>
+        </div>
       </UFormField>
 
       <!-- Type -->
@@ -117,22 +138,33 @@ const handleSubmit = async () => {
       </UFormField>
 
       <!-- Actions -->
-      <div class="flex justify-end gap-2 pt-2">
+      <div class="flex items-center justify-between pt-2">
         <UButton
           variant="ghost"
-          color="neutral"
+          color="error"
+          icon="i-heroicons-trash"
           type="button"
-          @click="closeModal"
+          @click="handleDelete"
         >
-          Annuler
+          Supprimer
         </UButton>
-        <UButton
-          type="submit"
-          color="primary"
-          :loading="isSubmitting"
-        >
-          Enregistrer
-        </UButton>
+        <div class="flex justify-end gap-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            type="button"
+            @click="closeModal"
+          >
+            Annuler
+          </UButton>
+          <UButton
+            type="submit"
+            color="primary"
+            :loading="isSubmitting"
+          >
+            Enregistrer
+          </UButton>
+        </div>
       </div>
     </form>
   </AppModal>
