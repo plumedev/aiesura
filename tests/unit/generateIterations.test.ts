@@ -81,4 +81,17 @@ describe('generateIterations', () => {
     expect(result[0]!.transactionId).toBe('tx-1')
     expect(result[0]!.userId).toBe('user-1')
   })
+
+  it('génère bien l\'itération de septembre pour une transaction débutant le 8 août avec fin au 26 septembre', () => {
+    const result = generateIterations({
+      ...base,
+      frequency: 'monthly',
+      startDate: new Date('2026-08-08'),
+      endDate: new Date('2026-09-26')
+    })
+    // Doit contenir 2 itérations : 8 août et 8 septembre (octobre exclu)
+    expect(result).toHaveLength(2)
+    expect(result[0]!.executionDate).toEqual(new Date('2026-08-08'))
+    expect(result[1]!.executionDate).toEqual(new Date('2026-09-08'))
+  })
 })
