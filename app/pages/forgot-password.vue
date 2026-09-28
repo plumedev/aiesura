@@ -10,10 +10,8 @@ const resetPassword = async () => {
   errorMsg.value = ''
   successMsg.value = ''
 
-  // Dans un vrai projet, il faudrait l'URL du site en production
-  // Pour le dev, supabase utilisera son URL de redirection par défaut configurée dans le dashboard
   const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
-    redirectTo: 'http://localhost:3000/update-password'
+    redirectTo: `${window.location.origin}/update-password`
   })
 
   if (error) {

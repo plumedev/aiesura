@@ -13,6 +13,17 @@ useSeoMeta({
   ogDescription: 'Planifiez vos dépenses prévisionnelles avec le système d’itérations et organisez vos virements d’épargne avec la checklist mensuelle.',
   twitterCard: 'summary_large_image'
 })
+
+onMounted(() => {
+  if (import.meta.client && window.location.hash) {
+    const hash = window.location.hash
+    if (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=invite')) {
+      navigateTo('/confirm' + hash)
+    } else if (hash.includes('type=recovery')) {
+      navigateTo('/update-password' + hash)
+    }
+  }
+})
 </script>
 
 <template>

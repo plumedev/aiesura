@@ -14,6 +14,7 @@ const register = async () => {
     email: email.value,
     password: password.value,
     options: {
+      emailRedirectTo: `${window.location.origin}/confirm`,
       data: {
         name: email.value.split('@')[0]
       }
