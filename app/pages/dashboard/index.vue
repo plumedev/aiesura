@@ -364,15 +364,16 @@ const formattedCurrentPeriod = computed(() => {
 
     <div class="flex flex-col gap-0 lg:gap-6 p-0 lg:p-4 flex-1 min-h-0 overflow-hidden">
       <!-- ── Sélecteur de période (Desktop) ── -->
-      <div class="hidden lg:flex flex-col sm:flex-row sm:items-center gap-2">
-        <p class="text-sm mr-2 text-gray-500 dark:text-gray-400 shrink-0">
+      <div class="hidden lg:flex flex-col gap-2 w-full">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
           Période analysée
         </p>
-        <div class="overflow-x-auto max-w-full">
+        <div class="w-full min-w-0">
           <ClientOnly>
             <OwlDatePicker
               v-if="useOwlDatePicker"
               v-model="dateRange"
+              class="w-full"
             />
             <OverviewDateRangePicker
               v-else

@@ -120,6 +120,19 @@ body {
   box-shadow: none !important;
   min-width: 0 !important;
   width: 100% !important;
+  --vod-range-bg: rgba(16, 185, 129, 0.122) !important;
+  --vod-range-border: rgba(16, 185, 129, 0.5) !important;
+}
+
+.vod__range {
+  background: var(--vod-range-bg, rgba(16, 185, 129, 0.122)) !important;
+  border-top-color: rgba(16, 185, 129, 0.32) !important;
+  border-bottom-color: rgba(16, 185, 129, 0.32) !important;
+}
+
+.vod__range:hover,
+.vod__range--dragging {
+  background: rgba(16, 185, 129, 0.3) !important;
 }
 
 .dark .vod {
@@ -129,6 +142,19 @@ body {
   --vod-border: rgba(255, 255, 255, 0.1) !important;
   --vod-text: #FFFFFF !important;
   --vod-text-muted: #9ca3af !important;
+  --vod-range-bg: rgba(52, 211, 153, 0.13) !important;
+  --vod-range-border: rgba(52, 211, 153, 0.32) !important;
+}
+
+.dark .vod__range {
+  background: var(--vod-range-bg, rgba(52, 211, 153, 0.13)) !important;
+  border-top-color: rgba(52, 211, 153, 0.32) !important;
+  border-bottom-color: rgba(52, 211, 153, 0.32) !important;
+}
+
+.dark .vod__range:hover,
+.dark .vod__range--dragging {
+  background: rgba(52, 211, 153, 0.2) !important;
 }
 
 .vod__preset-btn:hover {
