@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+echo "🔍 Exécution des tests de non-régression avant push (Vitest + Maestro)..."
+npm run alltest
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Push bloqué : des tests ont échoué !"
+  echo "💡 Pour forcer le push sans exécuter les tests : git push --no-verify"
+  exit 1
+fi

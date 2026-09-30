@@ -1,0 +1,21 @@
+url: http://localhost:3000/login
+name: "Connexion avec compte existant et redirection dashboard"
+---
+- launchApp
+- assertVisible: ".*Connectez-vous.*"
+
+# Saisie des identifiants
+- tapOn: "Adresse email"
+- inputText: "lucas.julian@proton.me"
+- tapOn: "Mot de passe"
+- inputText: "Lad3a2911l!"
+
+# Clic sur le bouton de connexion
+- tapOn: ".*Se connecter.*"
+
+# Attente et vérification de la redirection vers le dashboard
+- extendedWaitUntil:
+    visible: ".*Vue d'ensemble.*"
+    timeout: 15000
+
+- assertVisible: ".*Vue d'ensemble.*"

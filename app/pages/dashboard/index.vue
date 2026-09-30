@@ -26,6 +26,10 @@ const toggleDatePicker = () => {
   useOwlDatePicker.value = !useOwlDatePicker.value
 }
 
+const updateDateRange = (val: { start: Date, end: Date }) => {
+  dateRange.value = val
+}
+
 // Comptes disponibles pour le filtre multiselect
 const { data: accounts } = await useFetch<Array<{ id: string, name: string }>>('/api/accounts')
 const accountOptions = computed(() =>
@@ -334,6 +338,16 @@ const formattedCurrentPeriod = computed(() => {
       <template #leading>
         <UDashboardSidebarCollapse />
       </template>
+
+      <!-- Sélecteur classique (centré dans la navbar uniquement quand useOwlDatePicker est inactif) -->
+      <ClientOnly v-if="!useOwlDatePicker">
+        <OverviewDateRangePicker
+          class="hidden md:inline-flex"
+          :model-value="dateRange"
+          @update:model-value="updateDateRange"
+        />
+      </ClientOnly>
+
       <template #right>
         <div class="flex items-center gap-2">
           <UButton
@@ -349,7 +363,7 @@ const formattedCurrentPeriod = computed(() => {
           </UButton>
           <UButton
             :icon="useOwlDatePicker ? 'i-heroicons-calendar' : 'i-heroicons-adjustments-horizontal'"
-            :title="useOwlDatePicker ? 'Passer au sélecteur Slider' : 'Passer au sélecteur standard'"
+            :title="useOwlDatePicker ? 'Passer au sélecteur standard' : 'Passer au sélecteur Slider'"
             color="neutral"
             variant="ghost"
             size="xs"
@@ -363,22 +377,19 @@ const formattedCurrentPeriod = computed(() => {
     </UDashboardNavbar>
 
     <div class="flex flex-col gap-0 lg:gap-6 p-0 lg:p-4 flex-1 min-h-0 overflow-hidden">
-      <!-- ── Sélecteur de période (Desktop) ── -->
-      <div class="hidden lg:flex flex-col gap-2 w-full">
+      <!-- ── Sélecteur de période Slider (Desktop) ── -->
+      <div
+        v-if="useOwlDatePicker"
+        class="hidden lg:flex flex-col gap-2 w-full"
+      >
         <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
           Période analysée
         </p>
         <div class="w-full min-w-0">
           <ClientOnly>
             <OwlDatePicker
-              v-if="useOwlDatePicker"
               v-model="dateRange"
               class="w-full"
-            />
-            <OverviewDateRangePicker
-              v-else
-              :model-value="dateRange"
-              @update:model-value="dateRange = $event"
             />
           </ClientOnly>
         </div>
@@ -1078,7 +1089,7 @@ const formattedCurrentPeriod = computed(() => {
                 <OverviewDateRangePicker
                   v-else
                   :model-value="dateRange"
-                  @update:model-value="dateRange = $event"
+                  @update:model-value="updateDateRange"
                 />
               </ClientOnly>
             </div>

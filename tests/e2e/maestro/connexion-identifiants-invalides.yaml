@@ -1,0 +1,21 @@
+url: http://localhost:3000/login
+name: "Connexion avec mot de passe incorrect et message d'erreur"
+---
+- launchApp
+- assertVisible: ".*Connectez-vous.*"
+
+# Saisie d'un mot de passe incorrect
+- tapOn: "Adresse email"
+- inputText: "lucas.julian@proton.me"
+- tapOn: "Mot de passe"
+- inputText: "MauvaisMotDePasse123!"
+
+# Clic sur le bouton de connexion
+- tapOn: ".*Se connecter.*"
+
+# Vérification de l'alerte d'erreur
+- extendedWaitUntil:
+    visible: ".*Invalid login credentials.*"
+    timeout: 10000
+
+- assertVisible: ".*Invalid login credentials.*"
