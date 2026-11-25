@@ -31,7 +31,7 @@ const login = async () => {
             Connexion
           </h2>
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            Connectez-vous à votre espace Aiesura
+            Connectez-vous à votre espace Aesura
           </p>
         </div>
       </template>

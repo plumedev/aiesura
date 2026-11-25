@@ -6,10 +6,10 @@ const activeFeature = ref(0)
 const features = [
   {
     icon: 'i-lucide-calendar-range',
-    title: 'Itérations de dépenses',
+    title: 'Échéances de dépenses',
     badge: 'Fonction clé',
     subtitle: 'Ajuster un mois sans casser la suite',
-    description: 'Chaque dépense récurrente génère des itérations mensuelles. Si une facture varie un mois donné, ajustez seulement son itération.',
+    description: 'Chaque dépense récurrente génère des échéances mensuelles. Si une facture varie un mois donné, ajustez seulement son échéance.',
     details: [
       'Modification du montant ou de la date pour un mois précis',
       'Préservation automatique des règles des mois suivants',

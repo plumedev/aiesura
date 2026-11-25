@@ -58,7 +58,7 @@ onMounted(async () => {
         >
           <AppLogo class="w-auto h-6 shrink-0 text-[#0A332C] dark:text-emerald-400" />
           <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white inline-block">
-            Aiesura
+            Aesura
           </span>
         </NuxtLink>
       </template>

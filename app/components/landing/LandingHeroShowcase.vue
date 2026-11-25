@@ -119,7 +119,7 @@ const navItems = [
     <!-- Halo lumineux subtil -->
     <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-4/5 h-60 bg-emerald-600/10 dark:bg-emerald-400/5 blur-3xl pointer-events-none rounded-full" />
 
-    <!-- Fenêtre Application Fidèle à Aiesura -->
+    <!-- Fenêtre Application Fidèle à Aesura -->
     <div class="relative overflow-hidden rounded-2xl border border-black/10 dark:border-white/10 shadow-2xl bg-white dark:bg-[#0A332C] text-left">
       <!-- Barre d'en-tête Browser / OS -->
       <div class="flex items-center justify-between px-4 py-2.5 border-b border-black/10 dark:border-white/10 bg-gray-100/90 dark:bg-[#0C3C32]/90 backdrop-blur-md">
@@ -132,7 +132,7 @@ const navItems = [
               name="i-heroicons-lock-closed"
               class="w-3 h-3 text-emerald-600 dark:text-emerald-400"
             />
-            <span>https://aiesura.app/dashboard</span>
+            <span>https://aesura.app/dashboard</span>
           </div>
         </div>
 
@@ -152,7 +152,7 @@ const navItems = [
             <!-- Header sidebar avec Logo réel -->
             <div class="flex items-center gap-2 px-2 py-1">
               <AppLogo class="w-auto h-5 shrink-0 text-[#0A332C] dark:text-emerald-400" />
-              <span class="font-bold text-sm text-gray-900 dark:text-white">Aiesura</span>
+              <span class="font-bold text-sm text-gray-900 dark:text-white">Aesura</span>
             </div>
 
             <!-- Navigation identique à layouts/dashboard.vue -->
@@ -288,7 +288,7 @@ const navItems = [
                         Libellé
                       </th>
                       <th class="px-4 py-3">
-                        Itérations
+                        Échéances
                       </th>
                       <th class="px-4 py-3 hidden sm:table-cell">
                         Compte
@@ -332,7 +332,7 @@ const navItems = [
                             variant="subtle"
                             size="xs"
                           >
-                            {{ tx.iterationCount }} itérations
+                            {{ tx.iterationCount }} échéances
                           </UBadge>
                           <span
                             v-else
@@ -386,7 +386,7 @@ const navItems = [
                           </td>
 
                           <td class="px-4 py-2 text-gray-400 text-[10px]">
-                            Itération #{{ iter.id.slice(-1) }}
+                            Échéance #{{ iter.id.slice(-1) }}
                           </td>
 
                           <td class="px-4 py-2 text-gray-400 text-[10px] hidden sm:table-cell">

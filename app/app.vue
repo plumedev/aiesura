@@ -14,7 +14,7 @@ useHead({
   }
 })
 
-const title = 'Aiesura — Gestion financière personnelle'
+const title = 'Aesura — Gestion financière personnelle'
 const description = 'Suivez vos transactions, gérez vos comptes et analysez vos flux financiers en un seul endroit.'
 
 useSeoMeta({

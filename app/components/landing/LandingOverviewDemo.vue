@@ -82,7 +82,7 @@ const saveIteration = () => {
           <span>Tableau de bord : Vue d'ensemble</span>
         </div>
         <h4 class="text-xl font-bold text-gray-900 dark:text-white">
-          Ajustez vos itérations au mois le mois
+          Ajustez vos échéances au mois le mois
         </h4>
         <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
           Dépliez la transaction « Courses hebdomadaires » et cliquez sur « Modifier » pour ajuster une occurrence précise.
@@ -160,7 +160,7 @@ const saveIteration = () => {
               Libellé
             </th>
             <th class="px-4 py-3">
-              Itérations
+              Échéances
             </th>
             <th class="px-4 py-3 hidden sm:table-cell">
               Compte
@@ -207,7 +207,7 @@ const saveIteration = () => {
                   variant="subtle"
                   size="xs"
                 >
-                  {{ tx.iterationCount }} itérations
+                  {{ tx.iterationCount }} échéances
                 </UBadge>
                 <span
                   v-else
@@ -273,7 +273,7 @@ const saveIteration = () => {
                 </td>
 
                 <td class="px-4 py-2 text-gray-400 text-[10px]">
-                  Itération #{{ iter.id.slice(-1) }}
+                  Échéance #{{ iter.id.slice(-1) }}
                 </td>
 
                 <td class="px-4 py-2 text-gray-400 text-[10px] hidden sm:table-cell">
@@ -315,7 +315,7 @@ const saveIteration = () => {
     <AppModal
       v-if="editingIteration"
       :open="true"
-      title="Modifier l'itération"
+      title="Modifier l'échéance"
       description="Cette modification s'applique uniquement à cette occurrence dans la plage analysée. La transaction parente reste intacte."
       @close="closeEditModal"
     >
@@ -326,7 +326,7 @@ const saveIteration = () => {
         <!-- Nom -->
         <div>
           <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            Libellé de l'itération
+            Libellé de l'échéance
           </label>
           <UInput
             v-model="modalForm.name"
@@ -371,7 +371,7 @@ const saveIteration = () => {
           />
           <UButton
             type="submit"
-            label="Enregistrer l'itération"
+            label="Enregistrer l'échéance"
             color="primary"
             variant="solid"
             size="sm"

@@ -62,7 +62,7 @@ onMounted(async () => {
             Confirmation du compte
           </h2>
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            Finalisation de votre inscription à Aiesura
+            Finalisation de votre inscription à Aesura
           </p>
         </div>
       </template>

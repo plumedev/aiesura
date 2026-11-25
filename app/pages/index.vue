@@ -3,14 +3,13 @@ import LandingHeroShowcase from '~/components/landing/LandingHeroShowcase.vue'
 import LandingOverviewDemo from '~/components/landing/LandingOverviewDemo.vue'
 import LandingFlowDemo from '~/components/landing/LandingFlowDemo.vue'
 import LandingChecklistDemo from '~/components/landing/LandingChecklistDemo.vue'
-import LandingFeatures from '~/components/landing/LandingFeatures.vue'
 import LandingCta from '~/components/landing/LandingCta.vue'
 
 useSeoMeta({
-  title: 'Aiesura — Gestion financière personnelle & planification de flux',
-  ogTitle: 'Aiesura — Gestion financière personnelle & planification de flux',
-  description: 'Planifiez vos dépenses prévisionnelles avec le système d’itérations et organisez vos virements d’épargne avec la checklist mensuelle.',
-  ogDescription: 'Planifiez vos dépenses prévisionnelles avec le système d’itérations et organisez vos virements d’épargne avec la checklist mensuelle.',
+  title: 'Aesura — Gestion financière personnelle & planification de flux',
+  ogTitle: 'Aesura — Gestion financière personnelle & planification de flux',
+  description: 'Planifiez vos dépenses prévisionnelles avec le système d’échéances et organisez vos virements d’épargne avec la checklist mensuelle.',
+  ogDescription: 'Planifiez vos dépenses prévisionnelles avec le système d’échéances et organisez vos virements d’épargne avec la checklist mensuelle.',
   twitterCard: 'summary_large_image'
 })
 
@@ -50,13 +49,13 @@ onMounted(() => {
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.15]">
           Planifiez vos dépenses et virements, <br class="hidden sm:inline">
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0A332C] via-emerald-700 to-teal-600 dark:from-emerald-300 dark:via-teal-300 dark:to-emerald-400">
-            mois par mois, sans casser vos règles.
+            mois par mois, en quelques minutes.
           </span>
         </h1>
 
         <!-- Sous-titre honnête et réaliste -->
         <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          Aiesura combine une gestion d’itérations (ajustez une dépense ponctuelle sans altérer sa récurrence) et un planificateur de flux pour exécuter vos virements d’épargne en toute clarté.
+          Listez vos dépenses et revenus, leurs fréquences, ajustez les montants chaque mois et n'oubliez rien. Pas d'oublis, pas de soucis.
         </p>
 
         <!-- Boutons d'action -->
@@ -89,7 +88,7 @@ onMounted(() => {
               name="i-lucide-check-circle-2"
               class="w-4 h-4 text-emerald-600 dark:text-emerald-400"
             />
-            Ajustement d’itérations par mois
+            Ajustement d’échéances par mois
           </span>
           <span class="flex items-center gap-1.5">
             <UIcon
@@ -119,10 +118,10 @@ onMounted(() => {
       id="features"
       class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto border-t border-black/5 dark:border-white/10"
     >
-      <LandingFeatures />
+      <!-- <LandingFeatures /> -->
     </section>
 
-    <!-- ── 3. MINI-DÉMO 1 : VUE D'ENSEMBLE & ITÉRATIONS ── -->
+    <!-- ── 3. MINI-DÉMO 1 : VUE D'ENSEMBLE & ÉCHÉANCES ── -->
     <section
       id="demo"
       class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto border-t border-black/5 dark:border-white/10 space-y-6"
@@ -132,10 +131,10 @@ onMounted(() => {
           <span>01 • Vue d'ensemble</span>
         </div>
         <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          Ajuster une itération sans modifier la règle récurrente
+          Une prime, une charges exceptionnellement plus élevée ce mois-ci ? Simple.
         </h2>
         <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">
-          Quand vous créez une dépense récurrente (ex: loyer, électricité), l'application génère ses itérations pour chaque mois. Si une facture est plus élevée ce mois-ci, modifiez uniquement son itération : les autres mois restent intacts.
+          Quand vous créez une dépense récurrente (ex: loyer, électricité), l'application génère ses échéances pour chaque mois. Si une facture est plus élevée ce mois-ci, modifiez uniquement son échéance : les autres mois restent intacts.
         </p>
       </div>
 

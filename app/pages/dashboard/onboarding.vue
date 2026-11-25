@@ -319,7 +319,7 @@ onMounted(async () => {
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <AppLogo class="h-6 md:h-8 w-auto filter invert brightness-0" />
-            <span class="font-bold text-base md:text-lg text-white">Aiesura</span>
+            <span class="font-bold text-base md:text-lg text-white">Aesura</span>
           </div>
           <div class="flex items-center gap-2 md:hidden">
             <button
@@ -430,7 +430,7 @@ onMounted(async () => {
         </p>
 
         <div class="flex items-center justify-between text-xs text-emerald-300 border-t border-emerald-800/40 pt-3">
-          <span>Aiesura © {{ new Date().getFullYear() }}</span>
+          <span>Aesura © {{ new Date().getFullYear() }}</span>
           <UColorModeButton class="text-white hover:bg-white/10" />
         </div>
       </div>

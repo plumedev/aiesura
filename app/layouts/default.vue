@@ -23,7 +23,7 @@ const navLinks = [
         >
           <AppLogo class="w-auto h-6 shrink-0 text-[#0A332C] dark:text-emerald-400" />
           <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white inline-block">
-            Aiesura
+            Aesura
           </span>
         </NuxtLink>
       </template>
@@ -141,7 +141,7 @@ const navLinks = [
         <div class="flex flex-col items-center sm:items-start gap-1">
           <div class="flex items-center gap-2">
             <AppLogo class="w-auto h-5 shrink-0 text-[#0A332C] dark:text-emerald-400" />
-            <span class="font-bold text-sm text-gray-900 dark:text-white">Aiesura</span>
+            <span class="font-bold text-sm text-gray-900 dark:text-white">Aesura</span>
           </div>
           <p class="text-xs text-gray-500 dark:text-gray-400">
             Gestion financière personnelle proactive, répartition automatisée des flux et clarté budgétaire.
@@ -162,7 +162,7 @@ const navLinks = [
             Créer un compte
           </NuxtLink>
           <span>•</span>
-          <span>© {{ new Date().getFullYear() }} Aiesura. Tous droits réservés.</span>
+          <span>© {{ new Date().getFullYear() }} Aesura. Tous droits réservés.</span>
         </div>
       </div>
     </footer>

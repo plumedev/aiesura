@@ -39,7 +39,7 @@ const register = async () => {
             Créer un compte
           </h2>
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            Commencez à piloter vos finances avec Aiesura
+            Commencez à piloter vos finances avec Aesura
           </p>
         </div>
       </template>
